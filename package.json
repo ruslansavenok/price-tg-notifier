@@ -1,0 +1,17 @@
+{
+  "name": "price-tg-notifier",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:ruslansavenok/price-tg-notifier.git",
+  "author": "Ruslan Savenok <ruslan.savenok@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon index.ts"
+  },
+  "dependencies": {
+    "@types/node": "^16.11.6",
+    "nodemon": "^2.0.14",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.4.4"
+  }
+}
