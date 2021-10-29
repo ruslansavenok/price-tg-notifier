@@ -1,6 +1,4 @@
 // next steps
-// - tslint
-// - prettier
 // - config .evn
 // - bot raw commands
 // - docker

@@ -6,12 +6,26 @@
   "author": "Ruslan Savenok <ruslan.savenok@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.ts"
+    "dev": "nodemon index.ts",
+    "eslint": "eslint . --ext .ts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged && yarn eslint"
+    }
   },
   "dependencies": {
-    "@types/node": "^16.11.6",
-    "nodemon": "^2.0.14",
     "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
+    "eslint": "^8.1.0",
+    "husky": "^7.0.4",
+    "nodemon": "^2.0.14",
+    "prettier": "^2.4.1",
+    "pretty-quick": "^3.1.1"
   }
 }
