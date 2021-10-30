@@ -2,11 +2,15 @@ import dotEnv from 'dotenv';
 
 dotEnv.config();
 
-function getEnvVariable(key: string, required: boolean = true) {
+function getEnvVariable(key: string, required?: true): string;
+function getEnvVariable(key: string, required: false): string | undefined;
+function getEnvVariable(key: string, required = true) {
   const value = process.env[key];
-  if (required && typeof value === 'undefined') {
+
+  if (required && value === undefined) {
     throw new Error(`Env variable "${key}" is required`);
   }
+
   return value;
 }
 

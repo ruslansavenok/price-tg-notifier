@@ -1,8 +1,13 @@
-import { TELEGRAM_BOT_TOKEN } from '../config';
+import tgBot from './bot';
+import startParser from './parser';
 
 // next steps
 // - bot raw commands
 // - docker
 // - render.com deployment
 // - html parsing lib
-console.log('it works', TELEGRAM_BOT_TOKEN);
+(async function () {
+  startParser();
+  tgBot.start();
+  console.log('bot started...');
+})();
