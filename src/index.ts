@@ -8,6 +8,7 @@ import startParser from './parser';
 // - html parsing lib
 (async function () {
   startParser();
+  console.log('Parser started..');
   tgBot.start();
-  console.log('bot started...');
+  console.log('Bot started...');
 })();
