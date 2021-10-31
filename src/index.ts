@@ -1,4 +1,4 @@
-import tgBot from './bot';
+import startBot from './bot';
 import startParser from './parser';
 
 // next steps
@@ -9,6 +9,6 @@ import startParser from './parser';
 (async function () {
   startParser();
   console.log('Parser started..');
-  tgBot.start();
+  startBot();
   console.log('Bot started...');
 })();
