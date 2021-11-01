@@ -3,12 +3,14 @@ import { TELEGRAM_BOT_TOKEN } from '../../config';
 import loginHandler from './loginHandler';
 import subscribeHandler from './subscribeHandler';
 import unsubscribeHandler from './unsubsribeHandler';
+import listHandler from './listHandler';
 
 const bot = new Bot(TELEGRAM_BOT_TOKEN);
 
 bot.use(loginHandler('login'));
 bot.use(subscribeHandler('sub'));
 bot.use(unsubscribeHandler('unsub'));
+bot.use(listHandler('list'));
 
 async function startBot() {
   await bot.api.setMyCommands([
@@ -20,6 +22,10 @@ async function startBot() {
     {
       command: 'unsub',
       description: 'Unscrubscribe from item updates'
+    },
+    {
+      command: 'list',
+      description: 'Show subscribed items'
     }
   ]);
   bot.start();
