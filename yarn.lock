@@ -29,6 +29,13 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@grammyjs/runner@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@grammyjs/runner/-/runner-1.0.2.tgz#6a02c7738d0b16c3f1b66e2123141c54ab839797"
+  integrity sha512-3aNnLshAsm9PynIjICYzFZKviS+XLsxkPrY8/LEnhm1fKHm9pp0k2sALH21v/ATZPQ6EyPLDDJ29Wv/wbhjE5A==
+  dependencies:
+    abort-controller "^3.0.0"
+
 "@grammyjs/transformer-throttler@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@grammyjs/transformer-throttler/-/transformer-throttler-1.0.1.tgz#8ffcc652c871294e1e31292dfb2e1d4c155a7e36"

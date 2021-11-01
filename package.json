@@ -15,6 +15,7 @@
     }
   },
   "dependencies": {
+    "@grammyjs/runner": "^1.0.2",
     "@grammyjs/transformer-throttler": "^1.0.1",
     "@types/qs": "^6.9.7",
     "dotenv": "^10.0.0",

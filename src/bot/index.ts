@@ -1,5 +1,6 @@
 import { Bot, GrammyError, HttpError } from 'grammy';
 import { apiThrottler } from '@grammyjs/transformer-throttler';
+import { run } from '@grammyjs/runner';
 import { TELEGRAM_BOT_TOKEN } from '../../config';
 import loginHandler from './loginHandler';
 import subscribeHandler from './subscribeHandler';
@@ -43,7 +44,7 @@ async function startBot() {
       description: 'Show subscribed items'
     }
   ]);
-  bot.start();
+  run(bot);
 }
 
 export default startBot;
