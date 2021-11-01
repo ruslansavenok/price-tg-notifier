@@ -14,6 +14,7 @@ function getEnvVariable(key: string, required = true) {
   return value;
 }
 
+export const MONGO_DB_URL = getEnvVariable('MONGO_DB_URL');
 export const DATASOURCE_HOSTNAME = getEnvVariable('DATASOURCE_HOSTNAME');
 export const TELEGRAM_BOT_TOKEN = getEnvVariable('TELEGRAM_BOT_TOKEN');
 
