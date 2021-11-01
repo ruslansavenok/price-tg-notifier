@@ -29,6 +29,13 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@grammyjs/transformer-throttler@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@grammyjs/transformer-throttler/-/transformer-throttler-1.0.1.tgz#8ffcc652c871294e1e31292dfb2e1d4c155a7e36"
+  integrity sha512-zDAwRRzlzPx6ZwrzbAwmi1dnduKOd3TNV71HxV9AqM7MDqG4tzzkKSBENlOCAN5aNBTrIL3eYIanfUZXFvJ5nA==
+  dependencies:
+    bottleneck "^2.0.0"
+
 "@grammyjs/types@^2.2.6":
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/@grammyjs/types/-/types-2.2.6.tgz#0d19249a63e483ab0a0a014d5979e028c5444d29"
@@ -301,6 +308,11 @@ binary-extensions@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
+
+bottleneck@^2.0.0:
+  version "2.19.5"
+  resolved "https://registry.yarnpkg.com/bottleneck/-/bottleneck-2.19.5.tgz#5df0b90f59fd47656ebe63c78a98419205cadd91"
+  integrity sha512-VHiNCbI1lKdl44tGrhNfU3lup0Tj/ZBMJB5/2ZbNXRCPuRCO7ed2mgcK4r17y+KB2EfuYuRaVlwNbAeaWGSpbw==
 
 boxen@^5.0.0:
   version "5.1.2"

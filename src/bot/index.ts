@@ -1,4 +1,5 @@
 import { Bot, GrammyError, HttpError } from 'grammy';
+import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { TELEGRAM_BOT_TOKEN } from '../../config';
 import loginHandler from './loginHandler';
 import subscribeHandler from './subscribeHandler';
@@ -6,6 +7,7 @@ import unsubscribeHandler from './unsubsribeHandler';
 import listHandler from './listHandler';
 
 const bot = new Bot(TELEGRAM_BOT_TOKEN);
+bot.api.config.use(apiThrottler());
 
 bot.use(loginHandler('login'));
 bot.use(subscribeHandler('sub'));
