@@ -1,13 +1,14 @@
 import { Schema, model } from 'mongoose';
 
-interface TgBotUser {
+export interface ITgBotUser {
   tgUserId: string;
   tgUsername: string;
   tgName: string;
+  isAdmin: boolean;
   accessCode: Schema.Types.ObjectId;
 }
 
-const TgBotUserSchema = new Schema<TgBotUser>({
+const TgBotUserSchema = new Schema<ITgBotUser>({
   tgUserId: {
     type: String,
     index: true,
@@ -22,6 +23,10 @@ const TgBotUserSchema = new Schema<TgBotUser>({
     type: String,
     index: true,
     required: true
+  },
+  isAdmin: {
+    type: Boolean,
+    index: true
   },
   accessCode: {
     type: Schema.Types.ObjectId,

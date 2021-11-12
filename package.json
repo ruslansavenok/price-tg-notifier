@@ -22,11 +22,15 @@
     "grammy": "^1.3.4",
     "mongoose": "^6.0.12",
     "qs": "^6.10.1",
+    "table": "^6.7.3",
     "ts-node": "^10.4.0",
-    "typescript": "^4.4.4"
+    "typescript": "^4.4.4",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@grammyjs/types": "^2.3.1",
     "@types/node": "^16.11.6",
+    "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "eslint": "^8.1.0",

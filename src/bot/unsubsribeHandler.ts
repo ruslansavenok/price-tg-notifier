@@ -1,12 +1,13 @@
 import { Composer } from 'grammy';
 import { SERVERS } from '../../config';
-import { parseMessage, parseItemId } from './utils';
+import { parseMessageData, parseItemId } from './utils';
 
 function handleUnsubsribeCommandFactory(command: string) {
   const bot = new Composer();
 
-  bot.command(command, ctx => {
-    const [itemUrlOrId, serverName] = parseMessage(command, ctx.message?.text);
+  bot.command(command, async ctx => {
+    const { args } = await parseMessageData(ctx);
+    const [itemUrlOrId, serverName] = args;
     const itemId = parseItemId(itemUrlOrId);
     let serverIds = null;
 

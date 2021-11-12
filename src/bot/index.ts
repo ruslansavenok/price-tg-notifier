@@ -6,6 +6,8 @@ import loginHandler from './loginHandler';
 import subscribeHandler from './subscribeHandler';
 import unsubscribeHandler from './unsubsribeHandler';
 import listHandler from './listHandler';
+import adminGenKeyHandler from './admin/genKeyHandler';
+import adminListKeysHandler from './admin/listKeysHandler';
 
 const bot = new Bot(TELEGRAM_BOT_TOKEN);
 bot.api.config.use(apiThrottler());
@@ -14,6 +16,8 @@ bot.use(loginHandler('login'));
 bot.use(subscribeHandler('sub'));
 bot.use(unsubscribeHandler('unsub'));
 bot.use(listHandler('list'));
+bot.use(adminGenKeyHandler('adminGenKey'));
+bot.use(adminListKeysHandler('adminListKeys'));
 
 bot.catch(err => {
   const ctx = err.ctx;

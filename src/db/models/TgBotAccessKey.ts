@@ -1,24 +1,28 @@
 import { Schema, model } from 'mongoose';
 
-interface TgBotAccessKey {
+export interface ITgBotAccessKey {
   key: string;
+  durationInDays: number;
   expireAt: Date;
-  maxSubscribtions: number;
+  maxCheckItems: number;
   assignedToUser: Schema.Types.ObjectId;
 }
 
-const TgBotAccessKeySchema = new Schema<TgBotAccessKey>({
+const TgBotAccessKeySchema = new Schema<ITgBotAccessKey>({
   key: {
-    type: 'String',
+    type: String,
     unique: true,
     index: true,
     required: true
   },
-  expireAt: {
-    type: Date,
+  durationInDays: {
+    type: Number,
     required: true
   },
-  maxSubscribtions: {
+  expireAt: {
+    type: Date
+  },
+  maxCheckItems: {
     type: Number,
     required: true
   },

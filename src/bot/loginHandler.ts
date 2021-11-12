@@ -1,20 +1,17 @@
 import { Composer } from 'grammy';
-import { parseMessage } from './utils';
+import { parseMessageData } from './utils';
+import TgBotUser from '../db/models/TgBotUser';
 
 function handleLoginCommandFactory(command: string) {
   const bot = new Composer();
 
-  bot.command(command, ctx => {
-    const [authKey] = parseMessage(command, ctx.message?.text);
+  bot.command(command, async ctx => {
+    const { args, user } = await parseMessageData(ctx);
+    const authKey = args[0];
 
-    if (authKey) {
-      ctx.reply(`ok ${authKey}`);
-    } else {
-      ctx.reply(`
-Invalid format:
-/${command} <key>
-`);
-    }
+    if (!authKey) return ctx.reply(`Invalid format:\n /${command} <key>`);
+
+    ctx.reply(`ok ${authKey}, user: ${user.tgUserId}`);
   });
 
   return bot;
