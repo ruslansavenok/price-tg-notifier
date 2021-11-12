@@ -31,7 +31,8 @@ const TgBotUserSchema = new Schema<ITgBotUser>({
   accessCode: {
     type: Schema.Types.ObjectId,
     ref: 'TgBotAccessCode',
-    unique: true
+    unique: true,
+    sparse: true
   }
 });
 
