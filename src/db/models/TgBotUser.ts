@@ -1,11 +1,13 @@
 import { Schema, model } from 'mongoose';
+import { ITgBotAccessKey } from './TgBotAccessKey';
 
 export interface ITgBotUser {
+  _id: Schema.Types.ObjectId;
   tgUserId: string;
   tgUsername: string;
   tgName: string;
   isAdmin: boolean;
-  accessCode: Schema.Types.ObjectId;
+  accessCode: ITgBotAccessKey;
 }
 
 const TgBotUserSchema = new Schema<ITgBotUser>({
@@ -30,7 +32,7 @@ const TgBotUserSchema = new Schema<ITgBotUser>({
   },
   accessCode: {
     type: Schema.Types.ObjectId,
-    ref: 'TgBotAccessCode',
+    ref: 'tg_bot_access_key',
     unique: true,
     sparse: true
   }

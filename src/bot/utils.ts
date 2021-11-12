@@ -4,10 +4,6 @@ import type { User } from '@grammyjs/types';
 import { DATASOURCE_HOSTNAME } from '../../config';
 import TgBotUser, { ITgBotUser } from '../db/models/TgBotUser';
 
-export function parseMessage(match: string = ''): string[] {
-  return match.toLocaleLowerCase().split(' ');
-}
-
 export async function parseMessageData(ctx: Context):
   | Promise<{
       user: ITgBotUser;
@@ -17,12 +13,27 @@ export async function parseMessageData(ctx: Context):
   if (!ctx.message?.from) throw new Error('Invalid ctx');
 
   const user = await findAnSyncTgBotUser(ctx.message.from);
-  const args = parseMessage(ctx.match as string);
+  const args = (ctx.match as string).toLocaleString().split(' ');
 
   return {
     user,
     args
   };
+}
+
+export function isValidSubscription(ctx: Context, user: ITgBotUser): boolean {
+  if (!user.accessCode) {
+    ctx.reply('Login required');
+    return false;
+  }
+
+  if (user.accessCode.expireAt < new Date()) {
+    ctx.reply(`ption expired at \`${user.accessCode.expireAt}\``, {
+      parse_mode: 'Markdown'
+    });
+    return false;
+  }
+  return true;
 }
 
 export async function findAnSyncTgBotUser(data: User) {
@@ -39,7 +50,7 @@ export async function findAnSyncTgBotUser(data: User) {
       new: true,
       upsert: true
     }
-  );
+  ).populate('accessCode');
 }
 
 export function parseItemId(value: string): number {

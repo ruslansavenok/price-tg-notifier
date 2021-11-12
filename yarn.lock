@@ -535,6 +535,11 @@ crypto-random-string@^2.0.0:
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
   integrity sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
 
+date-fns@^2.25.0:
+  version "2.25.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.25.0.tgz#8c5c8f1d958be3809a9a03f4b742eba894fc5680"
+  integrity sha512-ovYRFnTrbGPD4nqaEqescPEv1mNwvt+UTqI3Ay9SzNtey9NZnYu6E2qCcBBgJ6/2VF1zGGygpyTDITqpQQ5e+w==
+
 debug@4.x, debug@^4.1.1, debug@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.2.tgz#f0a49c18ac8779e31d4a0c6029dfb76873c7428b"
@@ -1828,6 +1833,11 @@ table@^6.7.3:
     slice-ansi "^4.0.0"
     string-width "^4.2.3"
     strip-ansi "^6.0.1"
+
+telegraf-middleware-console-time@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/telegraf-middleware-console-time/-/telegraf-middleware-console-time-2.1.0.tgz#9f3ddcfc1117d783e33fc44e07088d78e9b74288"
+  integrity sha512-qHe5MlSPy6+v2OJ01M0breFDdPhXpCyYvUuGNyDfYrDssDFauAbl7pQAXFGqTQYtKerZsJEyueiHGQisfT1P7Q==
 
 text-table@^0.2.0:
   version "0.2.0"

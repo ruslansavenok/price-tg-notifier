@@ -1,4 +1,5 @@
 import { Bot, GrammyError, HttpError } from 'grammy';
+import { generateUpdateMiddleware } from 'telegraf-middleware-console-time';
 import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { run } from '@grammyjs/runner';
 import { TELEGRAM_BOT_TOKEN } from '../../config';
@@ -11,6 +12,8 @@ import adminListKeysHandler from './admin/listKeysHandler';
 
 const bot = new Bot(TELEGRAM_BOT_TOKEN);
 bot.api.config.use(apiThrottler());
+
+bot.use(generateUpdateMiddleware());
 
 bot.use(loginHandler('login'));
 bot.use(subscribeHandler('sub'));

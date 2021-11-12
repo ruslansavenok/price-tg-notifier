@@ -1,6 +1,6 @@
 import { Composer } from 'grammy';
 import { DATASOURCE_HOSTNAME, SERVERS } from '../../config';
-import { parseMessageData, parseItemId } from './utils';
+import { parseMessageData, isValidSubscription, parseItemId } from './utils';
 
 function parsePrice(value: string): number {
   const kRegex = /k/g;
@@ -20,7 +20,9 @@ function handleSubsribeCommandFactory(command: string) {
   const bot = new Composer();
 
   bot.command(command, async ctx => {
-    const { args: allArgs } = await parseMessageData(ctx);
+    const { args: allArgs, user } = await parseMessageData(ctx);
+    if (!isValidSubscription(ctx, user)) return;
+
     const [itemUrlOrId, ...args] = allArgs;
     let serverIds = null;
     let strPrice = null;

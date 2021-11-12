@@ -24,12 +24,12 @@ function handleGenKeyFactory(command: string) {
 
     try {
       const newKey = await TgBotAccessKey.create({
-        key: uuidv4(),
+        value: uuidv4(),
         durationInDays,
         maxCheckItems
       });
       ctx.reply(
-        `Added \`${newKey.key}\` duration=${durationInDays}, max=${maxCheckItems}`,
+        `Added \`${newKey.value}\` duration=${durationInDays}, max=${maxCheckItems}`,
         {
           parse_mode: 'Markdown'
         }

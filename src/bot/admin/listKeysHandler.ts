@@ -9,7 +9,7 @@ function renderResult(keys: ITgBotAccessKey[]) {
   const result: any[] = [['Key', 'Duration', 'Limit', 'User']];
 
   keys.forEach(item => {
-    const values = [item.key, item.durationInDays, item.maxCheckItems, '-'];
+    const values = [item.value, item.durationInDays, item.maxCheckItems, '-'];
     result.push(values);
   });
 

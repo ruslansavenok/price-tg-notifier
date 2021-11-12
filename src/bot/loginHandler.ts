@@ -1,6 +1,8 @@
 import { Composer } from 'grammy';
+import { add } from 'date-fns';
 import { parseMessageData } from './utils';
 import TgBotUser from '../db/models/TgBotUser';
+import TgBotAccessKey from '../db/models/TgBotAccessKey';
 
 function handleLoginCommandFactory(command: string) {
   const bot = new Composer();
@@ -11,7 +13,32 @@ function handleLoginCommandFactory(command: string) {
 
     if (!authKey) return ctx.reply(`Invalid format:\n /${command} <key>`);
 
-    ctx.reply(`ok ${authKey}, user: ${user.tgUserId}`);
+    const key = await TgBotAccessKey.findOne({ value: authKey });
+
+    if (
+      !key ||
+      key.expireAt < new Date() ||
+      (key.assignedToUser && key.assignedToUser !== user._id)
+    )
+      return ctx.reply('Invalid key');
+
+    await TgBotUser.findOneAndUpdate(
+      { tgUserId: user.tgUserId },
+      {
+        accessCode: key._id
+      }
+    );
+
+    if (!key.expireAt) {
+      key.expireAt = add(new Date(), {
+        days: key.durationInDays
+      });
+      await key.save();
+    }
+
+    ctx.reply(`Logged in! Key valid till \`${key.expireAt}\``, {
+      parse_mode: 'Markdown'
+    });
   });
 
   return bot;

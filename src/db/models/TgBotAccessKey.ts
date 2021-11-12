@@ -1,7 +1,8 @@
 import { Schema, model } from 'mongoose';
 
 export interface ITgBotAccessKey {
-  key: string;
+  _id: Schema.Types.ObjectId;
+  value: string;
   durationInDays: number;
   expireAt: Date;
   maxCheckItems: number;
@@ -9,7 +10,7 @@ export interface ITgBotAccessKey {
 }
 
 const TgBotAccessKeySchema = new Schema<ITgBotAccessKey>({
-  key: {
+  value: {
     type: String,
     unique: true,
     index: true,
@@ -28,7 +29,7 @@ const TgBotAccessKeySchema = new Schema<ITgBotAccessKey>({
   },
   assignedToUser: {
     type: Schema.Types.ObjectId,
-    ref: 'TgBotUser'
+    ref: 'tg_bot_user'
   }
 });
 
