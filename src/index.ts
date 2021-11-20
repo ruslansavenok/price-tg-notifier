@@ -3,10 +3,6 @@ import { setupConnection } from './db/connection';
 import startBot from './bot';
 import startParser from './parser';
 
-// next steps
-// - docker
-// - render.com deployment
-// - html parsing lib
 (async function () {
   await setupConnection(MONGO_DB_URL);
   console.log('Mongo connected..');

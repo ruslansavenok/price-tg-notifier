@@ -28,11 +28,12 @@ export function isValidSubscription(ctx: Context, user: ITgBotUser): boolean {
   }
 
   if (user.accessCode.expireAt < new Date()) {
-    ctx.reply(`ption expired at \`${user.accessCode.expireAt}\``, {
+    ctx.reply(`Subscription expired at \`${user.accessCode.expireAt}\``, {
       parse_mode: 'Markdown'
     });
     return false;
   }
+
   return true;
 }
 
