@@ -67,7 +67,7 @@ function handleSubsribeCommandFactory(command: string) {
 
       if (!parseItem) {
         try {
-          const { title } = await parseItemPage(itemId);
+          const { title } = await parseItemPage(itemId, SERVERS.AIRIN);
           parseItem = await ParseItem.create({ parseId: itemId, title });
         } catch (e) {
           return ctx.reply('Invalid <itemUrlOrId>');

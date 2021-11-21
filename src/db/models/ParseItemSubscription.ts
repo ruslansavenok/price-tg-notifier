@@ -7,6 +7,7 @@ export interface IParseItemSubscription {
   parseItem: IParseItem;
   servers: number[];
   priceLimit: number;
+  lastParsedAt: Date;
 }
 
 const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
@@ -26,6 +27,10 @@ const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
   priceLimit: {
     type: Number,
     required: true
+  },
+  lastParsedAt: {
+    type: Date,
+    index: true
   }
 });
 

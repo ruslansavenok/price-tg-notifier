@@ -21,5 +21,7 @@ export const TELEGRAM_BOT_TOKEN = getEnvVariable('TELEGRAM_BOT_TOKEN');
 export const SERVERS: { [key: string]: number } = {
   AIRIN: 45,
   ELCARDIA: 27,
-  HATOS: 12
+  HATOS: 12,
+  NAGA: 15,
+  SIRRA: 16
 };
