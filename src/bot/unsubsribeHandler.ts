@@ -1,6 +1,14 @@
 import { Composer } from 'grammy';
+import { stringify } from 'querystring';
 import { SERVERS } from '../../config';
+import ParseItem from '../db/models/ParseItem';
+import ParseItemSubscription from '../db/models/ParseItemSubscription';
 import { parseMessageData, isValidSubscription, parseItemId } from './utils';
+
+const invalidFormatMsg = (command: string) => `
+Invalid format:
+/${command} <itemUrlOrId>
+`;
 
 function handleUnsubsribeCommandFactory(command: string) {
   const bot = new Composer();
@@ -9,28 +17,24 @@ function handleUnsubsribeCommandFactory(command: string) {
     const { args, user } = await parseMessageData(ctx);
     if (!isValidSubscription(ctx, user)) return;
 
-    const [itemUrlOrId, serverName] = args;
+    const [itemUrlOrId] = args;
     const itemId = parseItemId(itemUrlOrId);
-    let serverIds = null;
 
-    if (serverName) {
-      const serverId = SERVERS[serverName.toUpperCase()];
-      if (serverId) serverIds = [serverId];
-    } else {
-      serverIds = Object.values(SERVERS);
-    }
+    if (isNaN(itemId)) return ctx.reply(invalidFormatMsg(command));
 
-    if (isNaN(itemId) || !serverIds) {
-      ctx.reply(`
-Invalid format:
-/${command} <itemUrlOrId> <serverName>
-/${command} <itemUrlOrId>
-`);
+    const parseItem = await ParseItem.findOne({ parseId: itemId });
+    if (!parseItem) return ctx.reply('Invalid <itemUrlOrId>');
+
+    const itemSubscription = await ParseItemSubscription.findOne({
+      tgUser: user,
+      parseItem
+    }).populate('parseItem');
+
+    if (itemSubscription) {
+      await itemSubscription.remove();
+      ctx.reply(`Unsubscribed: ${itemSubscription.parseItem.title}`);
     } else {
-      ctx.reply(`
-itemId: ${itemId}
-server: ${serverIds.join(',')}
-`);
+      ctx.reply('Nothing found :/');
     }
   });
 

@@ -6,10 +6,11 @@ import ParseItemSubscription, {
 import { parseMessageData, isValidSubscription } from './utils';
 
 function renderResult(items: IParseItemSubscription[]) {
-  const result: any[] = [['Title', 'Price', 'Servers']];
+  const result: any[] = [['ID', 'Title', 'Price', 'Servers']];
 
   items.forEach(item => {
     const values = [
+      item.parseItem.parseId,
       item.parseItem.title,
       item.priceLimit.toLocaleString(),
       item.servers.join(', ')
