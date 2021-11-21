@@ -1,6 +1,6 @@
-import { MONGO_DB_URL } from '../../config';
-import { setupConnection } from '../db/connection';
 import '../db/models/ParseItem';
+import '../db/models/TgBotUser';
+import '../db/models/TgBotAccessKey';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
 import parseItemPage from './parseItemPage';
 
@@ -8,8 +8,6 @@ async function sleep(ms: number) {
   return await new Promise(r => setTimeout(r, ms));
 }
 
-// TODO:
-// must check for user license
 async function processOldestTask() {
   const task = await ParseItemSubscription.findOne(
     {},
@@ -17,10 +15,18 @@ async function processOldestTask() {
     {
       sort: { lastParsedAt: 1 }
     }
-  ).populate('parseItem');
+  ).populate([
+    'parseItem',
+    {
+      path: 'tgUser',
+      populate: {
+        path: 'accessCode'
+      }
+    }
+  ]);
 
-  if (task) {
-    for (let serverId of task.servers) {
+  if (task && task.tgUser.accessCode.expireAt < new Date()) {
+    for (const serverId of task.servers) {
       await parseItemPage(task.parseItem.parseId, serverId);
       console.log(`parsed ${task.parseItem.parseId}-${serverId}`);
     }
