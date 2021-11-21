@@ -1,9 +1,8 @@
 import { MONGO_DB_URL } from '../../config';
 import { setupConnection } from '../db/connection';
+import '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
 import parseItemPage from './parseItemPage';
-
-require('../db/models/ParseItem');
 
 async function sleep(ms: number) {
   return await new Promise(r => setTimeout(r, ms));
