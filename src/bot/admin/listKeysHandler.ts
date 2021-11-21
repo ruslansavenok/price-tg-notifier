@@ -6,7 +6,7 @@ import TgBotAccessKey, {
 } from '../../db/models/TgBotAccessKey';
 
 function renderResult(keys: ITgBotAccessKey[]) {
-  const result: any[] = [['Key', 'Duration', 'Limit', 'User']];
+  const result: (string | number)[][] = [['Key', 'Duration', 'Limit', 'User']];
 
   keys.forEach(item => {
     const values = [item.value, item.durationInDays, item.maxCheckItems, '-'];

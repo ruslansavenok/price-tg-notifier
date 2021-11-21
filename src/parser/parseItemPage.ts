@@ -16,7 +16,7 @@ async function fetchPageHtml(url: string): Promise<string> {
     method: 'GET',
     timeout: 3000,
     responseType: 'arraybuffer',
-    transformResponse: function (data: any, headers?: any) {
+    transformResponse: function (data: Buffer) {
       const iconv = new Iconv('windows-1251', 'utf-8');
       data = iconv.convert(data);
       return data.toString();

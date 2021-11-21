@@ -1,6 +1,4 @@
 import { Composer } from 'grammy';
-import { stringify } from 'querystring';
-import { SERVERS } from '../../config';
 import ParseItem from '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
 import { parseMessageData, isValidSubscription, parseItemId } from './utils';

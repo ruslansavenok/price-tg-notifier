@@ -6,7 +6,7 @@ import ParseItemSubscription, {
 import { parseMessageData, isValidSubscription } from './utils';
 
 function renderResult(items: IParseItemSubscription[]) {
-  const result: any[] = [['ID', 'Title', 'Price', 'Servers']];
+  const result: (string | number)[][] = [['ID', 'Title', 'Price', 'Servers']];
 
   items.forEach(item => {
     const values = [
