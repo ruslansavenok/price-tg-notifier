@@ -2,6 +2,7 @@ import '../db/models/ParseItem';
 import '../db/models/TgBotUser';
 import '../db/models/TgBotAccessKey';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
+import ParseItemListing from '../db/models/ParseItemListing';
 import parseItemPage from './parseItemPage';
 
 async function sleep(ms: number) {
@@ -25,10 +26,41 @@ async function processOldestTask() {
     }
   ]);
 
-  if (task && task.tgUser.accessCode.expireAt < new Date()) {
+  // TODO:
+  // 2. find tasks with same server-id pair to bulk them
+  // 3. add workers
+  // 4. handle crashing task
+  if (task && task.tgUser.accessCode.expireAt > new Date()) {
     for (const serverId of task.servers) {
-      await parseItemPage(task.parseItem.parseId, serverId);
-      console.log(`parsed ${task.parseItem.parseId}-${serverId}`);
+      const { title, listings } = await parseItemPage(
+        task.parseItem.parseId,
+        serverId
+      );
+
+      for (const listing of listings) {
+        await ParseItemListing.findOneAndUpdate(
+          {
+            listingId: listing.id
+          },
+          {
+            parseItem: task.parseItem._id,
+            listingId: listing.id,
+            sellerName: listing.sellerName,
+            registeredAt: new Date(listing.addedAt),
+            price: listing.price,
+            amount: listing.amount,
+            enchantmentLvl: listing.enchantmentLvl
+          },
+          {
+            new: true,
+            upsert: true
+          }
+        );
+      }
+
+      console.log(
+        `Processed ${listings.length} listings for ${title} on server ${serverId}`
+      );
     }
 
     task.lastParsedAt = new Date();
