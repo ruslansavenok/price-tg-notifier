@@ -31,40 +31,45 @@ async function processOldestTask() {
   // 3. add workers
   // 4. handle crashing task
   if (task && task.tgUser.accessCode.expireAt > new Date()) {
-    for (const serverId of task.servers) {
-      const { title, listings } = await parseItemPage(
-        task.parseItem.parseId,
-        serverId
-      );
+    const { title, listings } = await parseItemPage(
+      task.parseItem.parseId,
+      task.serverId
+    );
 
-      for (const listing of listings) {
-        await ParseItemListing.findOneAndUpdate(
-          {
-            listingId: listing.id
-          },
-          {
-            parseItem: task.parseItem._id,
-            listingId: listing.id,
-            sellerName: listing.sellerName,
-            registeredAt: new Date(listing.addedAt),
-            price: listing.price,
-            amount: listing.amount,
-            enchantmentLvl: listing.enchantmentLvl
-          },
-          {
-            new: true,
-            upsert: true
-          }
-        );
-      }
-
-      console.log(
-        `Processed ${listings.length} listings for ${title} on server ${serverId}`
+    for (const listing of listings) {
+      await ParseItemListing.findOneAndUpdate(
+        {
+          listingId: listing.id
+        },
+        {
+          parseItem: task.parseItem._id,
+          listingId: listing.id,
+          sellerName: listing.sellerName,
+          registeredAt: new Date(listing.addedAt),
+          price: listing.price,
+          amount: listing.amount,
+          enchantmentLvl: listing.enchantmentLvl
+        },
+        {
+          new: true,
+          upsert: true
+        }
       );
     }
 
-    task.lastParsedAt = new Date();
-    await task.save();
+    await ParseItemSubscription.updateMany(
+      {
+        parseItem: task.parseItem,
+        serverId: task.serverId
+      },
+      {
+        lastParsedAt: new Date()
+      }
+    );
+
+    console.log(
+      `Processed ${listings.length} listings for ${title} on server ${task.serverId}`
+    );
   }
 }
 

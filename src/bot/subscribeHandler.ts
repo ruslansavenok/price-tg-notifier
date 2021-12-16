@@ -74,22 +74,26 @@ function handleSubsribeCommandFactory(command: string) {
         }
       }
 
-      await ParseItemSubscription.findOneAndUpdate(
-        {
-          tgUser: user,
-          parseItem
-        },
-        {
-          servers: serverIds,
-          priceLimit: price
-        },
-        {
-          new: true,
-          upsert: true
-        }
-      );
-
-      ctx.reply(`OK ${parseItem.title} - ${price.toLocaleString()}`);
+      for (const serverId of serverIds) {
+        await ParseItemSubscription.findOneAndUpdate(
+          {
+            tgUser: user,
+            parseItem,
+            serverId
+          },
+          {
+            serverId,
+            priceLimit: price
+          },
+          {
+            new: true,
+            upsert: true
+          }
+        );
+        ctx.reply(
+          `OK ${parseItem.title} - ${price.toLocaleString()} - ${serverId}`
+        );
+      }
     }
   });
 

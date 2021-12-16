@@ -5,7 +5,7 @@ import { IParseItem } from './ParseItem';
 export interface IParseItemSubscription {
   tgUser: ITgBotUser;
   parseItem: IParseItem;
-  servers: number[];
+  serverId: number;
   priceLimit: number;
   lastParsedAt: Date;
 }
@@ -14,15 +14,19 @@ const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
   tgUser: {
     type: Schema.Types.ObjectId,
     ref: 'tg_bot_user',
-    required: true
+    required: true,
+    index: true
   },
   parseItem: {
     type: Schema.Types.ObjectId,
     ref: 'parse_item',
-    required: true
+    required: true,
+    index: true
   },
-  servers: {
-    type: [Number]
+  serverId: {
+    type: Number,
+    required: true,
+    index: true
   },
   priceLimit: {
     type: Number,
