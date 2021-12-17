@@ -49,8 +49,6 @@ async function processTask(task: IParseItemSubscription) {
   );
 }
 
-// TODO:
-// - handle crash
 export default async function startParser(workerId: number) {
   await ParseItemSubscription.updateMany(
     { currentWorkerId: workerId },
@@ -60,8 +58,10 @@ export default async function startParser(workerId: number) {
   );
 
   while (true) {
+    let task;
+
     try {
-      const task = await ParseItemSubscription.findOneAndUpdate(
+      task = await ParseItemSubscription.findOneAndUpdate(
         {
           currentWorkerId: null
         },
@@ -85,13 +85,22 @@ export default async function startParser(workerId: number) {
       if (task && task.tgUser.accessCode.expireAt > new Date()) {
         await processTask(task);
         console.log(
-          `Processed ${task.parseItem.title} for ${task.serverId} on worker ${workerId}`
+          `Processed ${task.parseItem.title} for server=${task.serverId} on worker ${workerId}`
         );
         task.currentWorkerId = null;
         await task.save();
       }
     } catch (e) {
-      console.log(`Parser crashed`, e);
+      console.log(e);
+
+      if (task) {
+        console.log(
+          `Task crashed ${task.parseItem.parseId} for server=${task.serverId}`
+        );
+        task.currentWorkerId = null;
+        task.lastParsedAt = new Date();
+        await task.save();
+      }
     }
     await sleep(5000);
   }

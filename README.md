@@ -1,1 +1,5 @@
-# price-tg-notifier
+// TODO
+// - logger library
+// - docker
+// - render.com deployment
+// - unit tests
