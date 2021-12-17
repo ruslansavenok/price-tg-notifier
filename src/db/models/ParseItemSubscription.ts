@@ -8,6 +8,7 @@ export interface IParseItemSubscription {
   serverId: number;
   priceLimit: number;
   lastParsedAt: Date;
+  currentWorkerId: number | null;
 }
 
 const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
@@ -35,6 +36,9 @@ const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
   lastParsedAt: {
     type: Date,
     index: true
+  },
+  currentWorkerId: {
+    type: Number
   }
 });
 
