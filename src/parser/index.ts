@@ -10,6 +10,7 @@ import ParseItemListing, {
   IParseItemlisting
 } from '../db/models/ParseItemListing';
 import bot from '../bot';
+import { serverNameFromId } from '../bot/utils';
 import logger from '../logger';
 import parseItemPage, { itemUrl } from './parseItemPage';
 
@@ -21,7 +22,6 @@ const newListingMessage = (
   task: Document<any, any, IParseItemSubscription> & IParseItemSubscription,
   listing: Document<any, any, IParseItemlisting> & IParseItemlisting
 ) => `🚨🚨
-*ID*: ${task.parseItem.parseId}
 *Title:* ${task.parseItem.title}
 *Price:* ${listing.price.toLocaleString()}
 *Amount:* ${listing.amount ? listing.amount.toLocaleString() : '-'}
@@ -29,7 +29,7 @@ const newListingMessage = (
 *ENH:* ${listing.enchantmentLvl ? `+${listing.enchantmentLvl}` : '-'}
 *SELLER:* ${listing.sellerName}
 *ID:* ${listing.listingId}
-*SERVER:* ${task.serverId}
+*SERVER:* ${serverNameFromId(task.serverId)}
 [OPEN L2ON](${itemUrl({
   itemId: task.parseItem.parseId,
   serverId: task.serverId
@@ -129,7 +129,9 @@ export default async function startParser(workerId: number) {
         await processTask(task);
         await markTaskParsed(task);
         logger.info(
-          `Processed ${task.parseItem.title} for server=${task.serverId} on worker ${workerId}`
+          `Processed ${task.parseItem.title} for server=${serverNameFromId(
+            task.serverId
+          )} on worker ${workerId}`
         );
       }
     } catch (e) {
@@ -138,7 +140,9 @@ export default async function startParser(workerId: number) {
       if (task) {
         await markTaskParsed(task);
         logger.error(
-          `Task crashed ${task.parseItem.parseId} for server=${task.serverId}`
+          `Task crashed ${task.parseItem.parseId} for server=${serverNameFromId(
+            task.serverId
+          )}`
         );
       }
     }

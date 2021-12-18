@@ -3,17 +3,21 @@ import { table } from 'table';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
-import { parseMessageData, isValidSubscription } from './utils';
+import {
+  parseMessageData,
+  isValidSubscription,
+  serverNameFromId
+} from './utils';
 
 function renderResult(items: IParseItemSubscription[]) {
-  const result: (string | number)[][] = [['ID', 'Title', 'Price', 'Server ID']];
+  const result: (string | number)[][] = [['ID', 'Title', 'Price', 'Server']];
 
   items.forEach(item => {
     const values = [
       item.parseItem.parseId,
       item.parseItem.title,
       item.priceLimit.toLocaleString(),
-      item.serverId
+      serverNameFromId(item.serverId)
     ];
     result.push(values);
   });

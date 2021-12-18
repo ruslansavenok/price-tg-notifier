@@ -3,7 +3,12 @@ import { DATASOURCE_HOSTNAME, SERVERS } from '../../config';
 import ParseItem from '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
 import parseItemPage from '../parser/parseItemPage';
-import { parseMessageData, isValidSubscription, parseItemId } from './utils';
+import {
+  parseMessageData,
+  isValidSubscription,
+  parseItemId,
+  serverNameFromId
+} from './utils';
 
 const invalidFormatMessage = (command: string) => `
 Invalid format:
@@ -91,7 +96,9 @@ function handleSubsribeCommandFactory(command: string) {
           }
         );
         ctx.reply(
-          `OK ${parseItem.title} - ${price.toLocaleString()} - ${serverId}`
+          `OK ${
+            parseItem.title
+          } - ${price.toLocaleString()} - ${serverNameFromId(serverId)}`
         );
       }
     }

@@ -1,7 +1,12 @@
 import { Composer } from 'grammy';
 import ParseItem from '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
-import { parseMessageData, isValidSubscription, parseItemId } from './utils';
+import {
+  parseMessageData,
+  isValidSubscription,
+  parseItemId,
+  serverNameFromId
+} from './utils';
 
 const invalidFormatMsg = (command: string) => `
 Invalid format:
@@ -31,7 +36,11 @@ function handleUnsubsribeCommandFactory(command: string) {
     if (itemSubscriptions) {
       for (const sub of itemSubscriptions) {
         await sub.remove();
-        ctx.reply(`Unsubscribed: ${sub.parseItem.title} on ${sub.serverId}`);
+        ctx.reply(
+          `Unsubscribed: ${sub.parseItem.title} on ${serverNameFromId(
+            sub.serverId
+          )}`
+        );
       }
     } else {
       ctx.reply('Nothing found :/');

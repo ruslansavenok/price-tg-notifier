@@ -1,7 +1,7 @@
 import qs from 'qs';
 import { Context } from 'grammy';
 import type { User } from '@grammyjs/types';
-import { DATASOURCE_HOSTNAME } from '../../config';
+import { DATASOURCE_HOSTNAME, SERVERS } from '../../config';
 import TgBotUser, { ITgBotUser } from '../db/models/TgBotUser';
 
 export async function parseMessageData(ctx: Context):
@@ -65,4 +65,12 @@ export function parseItemId(value: string): number {
   } else {
     return parseInt(value, 10);
   }
+}
+
+export function serverNameFromId(id: number): string {
+  for (const [serverKey, serverId] of Object.entries(SERVERS)) {
+    if (serverId === id)
+      return serverKey.charAt(0) + serverKey.toLowerCase().slice(0);
+  }
+  return 'unknown';
 }
