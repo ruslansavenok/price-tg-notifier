@@ -11,7 +11,13 @@ function handleLoginCommandFactory(command: string) {
     const { args, user } = await parseMessageData(ctx);
     const authKey = args[0];
 
-    if (!authKey) return ctx.reply(`Invalid format:\n /${command} <key>`);
+    if (!authKey) {
+      return ctx.reply(
+        user.accessCode
+          ? `Logged in! key=${user.accessCode.value}, expire at ${user.accessCode.expireAt}`
+          : `Invalid format:\n /${command} <key>`
+      );
+    }
 
     const key = await TgBotAccessKey.findOne({ value: authKey });
 
