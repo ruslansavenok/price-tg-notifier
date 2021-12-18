@@ -129,9 +129,9 @@ export default async function startParser(workerId: number) {
         await processTask(task);
         await markTaskParsed(task);
         logger.info(
-          `Processed ${task.parseItem.title} for server=${serverNameFromId(
+          `Processed ${task.parseItem.parseId} for server=${serverNameFromId(
             task.serverId
-          )} on worker ${workerId}`
+          )}, worker=${workerId}`
         );
       }
     } catch (e) {
