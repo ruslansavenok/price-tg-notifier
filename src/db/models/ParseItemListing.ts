@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
 export interface IParseItemlisting {
   parseItem: Schema.Types.ObjectId;
   listingId: number;
+  serverId: number;
   sellerName: string;
   registeredAt: Date;
   price: number;
@@ -16,6 +17,11 @@ const ParseItemListingSchema = new Schema<IParseItemlisting>({
     ref: 'parse_item'
   },
   listingId: {
+    type: Number,
+    required: true,
+    index: true
+  },
+  serverId: {
     type: Number,
     required: true,
     index: true
@@ -43,4 +49,7 @@ const ParseItemListingSchema = new Schema<IParseItemlisting>({
   }
 });
 
-export default model('parse_item_listing', ParseItemListingSchema);
+export default model<IParseItemlisting>(
+  'parse_item_listing',
+  ParseItemListingSchema
+);

@@ -23,14 +23,16 @@ function handleUnsubsribeCommandFactory(command: string) {
     const parseItem = await ParseItem.findOne({ parseId: itemId });
     if (!parseItem) return ctx.reply('Invalid <itemUrlOrId>');
 
-    const itemSubscription = await ParseItemSubscription.findOne({
+    const itemSubscriptions = await ParseItemSubscription.find({
       tgUser: user,
       parseItem
     }).populate('parseItem');
 
-    if (itemSubscription) {
-      await itemSubscription.remove();
-      ctx.reply(`Unsubscribed: ${itemSubscription.parseItem.title}`);
+    if (itemSubscriptions) {
+      for (const sub of itemSubscriptions) {
+        await sub.remove();
+        ctx.reply(`Unsubscribed: ${sub.parseItem.title} on ${sub.serverId}`);
+      }
     } else {
       ctx.reply('Nothing found :/');
     }

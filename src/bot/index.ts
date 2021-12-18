@@ -35,7 +35,7 @@ bot.catch(err => {
   }
 });
 
-async function startBot() {
+export async function startBot() {
   await bot.api.setMyCommands([
     { command: 'login', description: 'Login with key' },
     {
@@ -54,4 +54,4 @@ async function startBot() {
   run(bot);
 }
 
-export default startBot;
+export default bot;

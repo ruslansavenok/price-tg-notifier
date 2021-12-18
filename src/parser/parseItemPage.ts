@@ -8,7 +8,7 @@ export interface IItemListing {
   sellerName: string;
   sellerLocation: string;
   price: number;
-  addedAt: number;
+  registeredAt: number;
   amount?: number;
   enchantmentLvl?: number;
 }
@@ -17,6 +17,15 @@ export interface IParseItemInfo {
   title: string;
   listings: IItemListing[];
 }
+
+export const itemUrl = ({
+  itemId,
+  serverId
+}: {
+  itemId: number;
+  serverId: number;
+}) =>
+  `http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=${itemId}&setworld=${serverId}`;
 
 async function fetchPageHtml(url: string): Promise<string> {
   const page = await axios(url, {
@@ -45,7 +54,7 @@ async function parseItemPage(
   itemId: number,
   serverId: number
 ): Promise<IParseItemInfo> {
-  const url = `http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=${itemId}&setworld=${serverId}`;
+  const url = itemUrl({ itemId, serverId });
   const urlHtml = await fetchPageHtml(url);
   const $ = cherio.load(urlHtml);
 
@@ -66,7 +75,7 @@ async function parseItemPage(
     sellerLocation: findIndexByHeaderName('город'),
     price: findIndexByHeaderName('цена'),
     amount: findIndexByHeaderName('кол-во'),
-    addedAt: findIndexByHeaderName('замечен'),
+    registeredAt: findIndexByHeaderName('замечен'),
     enchantmentLvl: findIndexByHeaderName('мод.')
   };
 
@@ -92,7 +101,8 @@ async function parseItemPage(
           colIndex.amount >= 0
             ? parseInt(parseOrderValue($cols[colIndex.amount]), 10)
             : undefined,
-        addedAt: parseInt(parseOrderValue($cols[colIndex.addedAt]), 10) * 1000,
+        registeredAt:
+          parseInt(parseOrderValue($cols[colIndex.registeredAt]), 10) * 1000,
         enchantmentLvl:
           colIndex.enchantmentLvl >= 0
             ? parseInt(parseOrderValue($cols[colIndex.enchantmentLvl]), 10)

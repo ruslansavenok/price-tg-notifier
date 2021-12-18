@@ -42,4 +42,7 @@ const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
   }
 });
 
-export default model('parse_item_subscription', ParseItemSubscriptionSchema);
+export default model<IParseItemSubscription>(
+  'parse_item_subscription',
+  ParseItemSubscriptionSchema
+);
