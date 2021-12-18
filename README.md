@@ -1,5 +1,4 @@
 // TODO
-// - logger library
 // - docker
 // - render.com deployment
 //   - dev bot credentials

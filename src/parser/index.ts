@@ -10,6 +10,7 @@ import ParseItemListing, {
   IParseItemlisting
 } from '../db/models/ParseItemListing';
 import bot from '../bot';
+import logger from '../logger';
 import parseItemPage, { itemUrl } from './parseItemPage';
 
 async function sleep(ms: number) {
@@ -127,7 +128,7 @@ export default async function startParser(workerId: number) {
       if (task && task.tgUser.accessCode.expireAt > new Date()) {
         await processTask(task);
         await markTaskParsed(task);
-        console.log(
+        logger.info(
           `Processed ${task.parseItem.title} for server=${task.serverId} on worker ${workerId}`
         );
       }
@@ -136,7 +137,7 @@ export default async function startParser(workerId: number) {
 
       if (task) {
         await markTaskParsed(task);
-        console.log(
+        logger.error(
           `Task crashed ${task.parseItem.parseId} for server=${task.serverId}`
         );
       }
