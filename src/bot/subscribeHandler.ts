@@ -96,9 +96,9 @@ function handleSubsribeCommandFactory(command: string) {
           }
         );
         ctx.reply(
-          `OK ${
-            parseItem.title
-          } - ${price.toLocaleString()} - ${serverNameFromId(serverId)}`
+          `OK ${parseItem.title} - ${
+            price === MAX_ITEM_PRICE ? 'MAX' : price.toLocaleString()
+          } - ${serverNameFromId(serverId)}`
         );
       }
     }
