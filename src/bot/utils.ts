@@ -70,7 +70,7 @@ export function parseItemId(value: string): number {
 export function serverNameFromId(id: number): string {
   for (const [serverKey, serverId] of Object.entries(SERVERS)) {
     if (serverId === id)
-      return serverKey.charAt(0) + serverKey.toLowerCase().slice(0);
+      return serverKey.charAt(0) + serverKey.toLowerCase().slice(1);
   }
   return 'unknown';
 }
