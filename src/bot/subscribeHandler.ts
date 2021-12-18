@@ -1,5 +1,5 @@
 import { Composer } from 'grammy';
-import { DATASOURCE_HOSTNAME, SERVERS } from '../../config';
+import { DATASOURCE_HOSTNAME, SERVERS, MAX_ITEM_PRICE } from '../../config';
 import ParseItem from '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
 import parseItemPage from '../parser/parseItemPage';
@@ -63,7 +63,7 @@ function handleSubsribeCommandFactory(command: string) {
     }
 
     const itemId = parseItemId(itemUrlOrId);
-    const price = strPrice ? parsePrice(strPrice) : 99_000_000_000_000;
+    const price = strPrice ? parsePrice(strPrice) : MAX_ITEM_PRICE;
 
     if (isNaN(itemId) || isNaN(price) || !serverIds) {
       ctx.reply(invalidFormatMessage(command));

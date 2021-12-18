@@ -1,5 +1,6 @@
 import { Composer } from 'grammy';
 import { table } from 'table';
+import { MAX_ITEM_PRICE } from '../../config';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
@@ -16,7 +17,9 @@ function renderResult(items: IParseItemSubscription[]) {
     const values = [
       item.parseItem.parseId,
       item.parseItem.title,
-      item.priceLimit.toLocaleString(),
+      item.priceLimit === MAX_ITEM_PRICE
+        ? 'MAX'
+        : item.priceLimit.toLocaleString(),
       serverNameFromId(item.serverId)
     ];
     result.push(values);
