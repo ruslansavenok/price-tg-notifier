@@ -7,6 +7,7 @@ export interface IParseItemSubscription {
   parseItem: IParseItem;
   serverId: number;
   priceLimit: number;
+  minEnchantmentLevel: number;
   lastParsedAt: Date;
   currentWorkerId: number | null;
 }
@@ -32,6 +33,9 @@ const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
   priceLimit: {
     type: Number,
     required: true
+  },
+  minEnchantmentLevel: {
+    type: Number
   },
   lastParsedAt: {
     type: Date,

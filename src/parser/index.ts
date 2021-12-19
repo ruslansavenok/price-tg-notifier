@@ -67,11 +67,17 @@ async function processTask(
         }
       );
 
+    const validEnchantmentLevel =
+      !isNaN(listing.enchantmentLvl) && !isNaN(task.minEnchantmentLevel)
+        ? listing.enchantmentLvl >= task.minEnchantmentLevel
+        : true;
+
     if (ok === 0 || !value || !lastErrorObject) {
       throw { value, lastErrorObject };
     } else if (
       lastErrorObject.updatedExisting === false &&
-      listing.price <= task.priceLimit
+      listing.price <= task.priceLimit &&
+      validEnchantmentLevel
     ) {
       await bot.api.sendMessage(
         task.tgUser.tgUserId,

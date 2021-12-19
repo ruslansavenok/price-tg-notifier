@@ -14,9 +14,12 @@ function renderResult(items: IParseItemSubscription[]) {
   const result: (string | number)[][] = [['ID', 'Title', 'Price', 'Server']];
 
   items.forEach(item => {
+    const enchStr =
+      item.minEnchantmentLevel > 0 ? `(+${item.minEnchantmentLevel}) ` : '';
+
     const values = [
       item.parseItem.parseId,
-      item.parseItem.title,
+      enchStr + item.parseItem.title,
       item.priceLimit === MAX_ITEM_PRICE
         ? 'MAX'
         : item.priceLimit.toLocaleString(),

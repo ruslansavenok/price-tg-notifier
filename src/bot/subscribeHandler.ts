@@ -1,4 +1,5 @@
 import { Composer } from 'grammy';
+import parseArguments from 'minimist';
 import { DATASOURCE_HOSTNAME, SERVERS, MAX_ITEM_PRICE } from '../../config';
 import ParseItem from '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
@@ -12,14 +13,14 @@ import {
 
 const invalidFormatMessage = (command: string) => `
 Invalid format:
-/${command} <itemUrlOrId> <serverName> <priceInkk>
-/${command} <itemUrlOrId> <priceInkk>
-/${command} <itemUrlOrId> <serverName>
 /${command} <itemUrlOrId>
+-s (REQUIRED) serverName,serverName2
+-p (default: MAX) Price in kk
+-e (default: ANY) Enchantment Level
 
-/${command} http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=48576 airin 100kk
-/${command} 48576
-/${command} 48576 100kk
+/${command} http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=48576 -s airin -p 100kk
+/${command} 48576 -s airin,elcardia
+/${command} 48576 -s airin -p 100kk
 `;
 
 function parsePrice(value: string): number {
@@ -36,37 +37,53 @@ function parsePrice(value: string): number {
   }
 }
 
+function parseServerIds(serverNameOrNames: string = ''): [boolean, number[]] {
+  let isValidFormat = true;
+  let result = [];
+
+  for (const rawKey of serverNameOrNames.split(',')) {
+    const key = rawKey.trim().toUpperCase();
+    const keyVal = SERVERS[key];
+    if (keyVal) {
+      result.push(keyVal);
+    } else {
+      isValidFormat = false;
+      break;
+    }
+  }
+
+  return [isValidFormat, result];
+}
+
 function handleSubsribeCommandFactory(command: string) {
   const bot = new Composer();
 
   bot.command(command, async ctx => {
-    const { args: allArgs, user } = await parseMessageData(ctx);
+    const { args, user } = await parseMessageData(ctx);
     if (!isValidSubscription(ctx, user)) return;
 
-    const [itemUrlOrId, ...args] = allArgs;
-    let serverIds = null;
-    let strPrice = null;
+    const {
+      _: [itemUrlOrId],
+      s: argServerNameOrNames,
+      p: argPriceInkk,
+      e: argEnchantmentLevel
+    } = parseArguments(args);
 
-    if (args[0]) {
-      const possibleServerKey = args[0].toUpperCase();
-      const serverId = SERVERS[possibleServerKey];
-      if (serverId) serverIds = [serverId];
-    }
-
-    if (args.length === 0) {
-      serverIds = Object.values(SERVERS);
-    } else if (args.length === 1 && !serverIds) {
-      strPrice = args[0];
-      serverIds = Object.values(SERVERS);
-    } else if (args.length === 2) {
-      strPrice = args[1];
-    }
-
+    const [isServerIdsValid, serverIds] = parseServerIds(argServerNameOrNames);
     const itemId = parseItemId(itemUrlOrId);
-    const price = strPrice ? parsePrice(strPrice) : MAX_ITEM_PRICE;
+    const price = argPriceInkk ? parsePrice(argPriceInkk) : MAX_ITEM_PRICE;
+    const minEnchantmentLevel =
+      argEnchantmentLevel === undefined ? 0 : parseInt(argEnchantmentLevel, 10);
 
-    if (isNaN(itemId) || isNaN(price) || !serverIds) {
-      ctx.reply(invalidFormatMessage(command));
+    if (
+      isNaN(itemId) ||
+      isNaN(price) ||
+      !isServerIdsValid ||
+      isNaN(minEnchantmentLevel)
+    ) {
+      ctx.reply(invalidFormatMessage(command), {
+        parse_mode: 'Markdown'
+      });
     } else {
       let parseItem = await ParseItem.findOne({ parseId: itemId });
 
@@ -88,7 +105,8 @@ function handleSubsribeCommandFactory(command: string) {
           },
           {
             serverId,
-            priceLimit: price
+            priceLimit: price,
+            minEnchantmentLevel
           },
           {
             new: true,
