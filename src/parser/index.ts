@@ -93,6 +93,8 @@ async function markTaskParsed(
 }
 
 export default async function startParser(workerId: number) {
+  await sleep(3000);
+
   await ParseItemSubscription.updateMany(
     { currentWorkerId: workerId },
     {
@@ -145,7 +147,7 @@ export default async function startParser(workerId: number) {
           )}`
         );
       }
+      startParser(workerId);
     }
-    await sleep(5000);
   }
 }
