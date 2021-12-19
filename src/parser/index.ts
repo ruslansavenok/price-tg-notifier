@@ -68,7 +68,8 @@ async function processTask(
       );
 
     const validEnchantmentLevel =
-      !isNaN(listing.enchantmentLvl) && !isNaN(task.minEnchantmentLevel)
+      typeof listing.enchantmentLvl === 'number' &&
+      typeof task.minEnchantmentLevel === 'number'
         ? listing.enchantmentLvl >= task.minEnchantmentLevel
         : true;
 
