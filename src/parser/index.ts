@@ -45,6 +45,10 @@ async function processTask(
     task.serverId
   );
   const aDayAgo = dateSub(new Date(), { days: 1 });
+  const allSubscriptionsForGivenServer = await ParseItemSubscription.find({
+    parseItem: task.parseItem,
+    serverId: task.serverId
+  }).populate(['parseItem', 'tgUser']);
 
   for (const listing of listings) {
     const { ok, value, lastErrorObject } =
@@ -69,27 +73,31 @@ async function processTask(
         }
       );
 
-    const validEnchantmentLevel =
-      typeof listing.enchantmentLvl === 'number' &&
-      typeof task.minEnchantmentLevel === 'number'
-        ? listing.enchantmentLvl >= task.minEnchantmentLevel
-        : true;
-
     if (ok === 0 || !value || !lastErrorObject) {
       throw { value, lastErrorObject };
     } else if (
       listing.registeredAt > aDayAgo &&
-      lastErrorObject.updatedExisting === false &&
-      listing.price <= task.priceLimit &&
-      validEnchantmentLevel
+      lastErrorObject.updatedExisting === false
     ) {
-      await bot.api.sendMessage(
-        task.tgUser.tgUserId,
-        newListingMessage(task, value),
-        {
-          parse_mode: 'Markdown'
+      for (const subscription of allSubscriptionsForGivenServer) {
+        const validEnchantmentLevel =
+          typeof listing.enchantmentLvl === 'number' &&
+          typeof subscription.minEnchantmentLevel === 'number'
+            ? listing.enchantmentLvl >= subscription.minEnchantmentLevel
+            : true;
+
+        if (listing.price <= subscription.priceLimit && validEnchantmentLevel) {
+          await bot.api.sendMessage(
+            subscription.tgUser.tgUserId,
+            newListingMessage(subscription, value),
+            {
+              parse_mode: 'Markdown'
+            }
+          );
         }
-      );
+        subscription.lastParsedAt = new Date();
+        await subscription.save();
+      }
     }
   }
 }
