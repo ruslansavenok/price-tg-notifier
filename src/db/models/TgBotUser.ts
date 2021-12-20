@@ -38,4 +38,4 @@ const TgBotUserSchema = new Schema<ITgBotUser>({
   }
 });
 
-export default model('tg_bot_user', TgBotUserSchema);
+export default model<ITgBotUser>('tg_bot_user', TgBotUserSchema);

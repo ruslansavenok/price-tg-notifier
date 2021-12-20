@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { ITgBotUser } from './TgBotUser';
 
 export interface ITgBotAccessKey {
   _id: Schema.Types.ObjectId;
@@ -6,7 +7,7 @@ export interface ITgBotAccessKey {
   durationInDays: number;
   expireAt: Date;
   maxCheckItems: number;
-  assignedToUser: Schema.Types.ObjectId;
+  assignedToUser: ITgBotUser;
 }
 
 const TgBotAccessKeySchema = new Schema<ITgBotAccessKey>({
@@ -33,4 +34,7 @@ const TgBotAccessKeySchema = new Schema<ITgBotAccessKey>({
   }
 });
 
-export default model('tg_bot_access_key', TgBotAccessKeySchema);
+export default model<ITgBotAccessKey>(
+  'tg_bot_access_key',
+  TgBotAccessKeySchema
+);

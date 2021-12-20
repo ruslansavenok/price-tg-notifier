@@ -19,12 +19,14 @@ function handleLoginCommandFactory(command: string) {
       );
     }
 
-    const key = await TgBotAccessKey.findOne({ value: authKey });
+    const key = await TgBotAccessKey.findOne({ value: authKey }).populate(
+      'assignedToUser'
+    );
 
     if (
       !key ||
       key.expireAt < new Date() ||
-      (key.assignedToUser && key.assignedToUser !== user._id)
+      (key.assignedToUser && key.assignedToUser !== user)
     )
       return ctx.reply('Invalid key');
 
@@ -34,6 +36,8 @@ function handleLoginCommandFactory(command: string) {
         accessCode: key._id
       }
     );
+    key.assignedToUser = user;
+    await key.save();
 
     if (!key.expireAt) {
       key.expireAt = add(new Date(), {
