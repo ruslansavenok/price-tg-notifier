@@ -8,7 +8,7 @@ export interface IItemListing {
   sellerName: string;
   sellerLocation: string;
   price: number;
-  registeredAt: number;
+  registeredAt: Date;
   amount?: number;
   enchantmentLvl?: number;
 }
@@ -101,8 +101,9 @@ async function parseItemPage(
           colIndex.amount >= 0
             ? parseInt(parseOrderValue($cols[colIndex.amount]), 10)
             : undefined,
-        registeredAt:
-          parseInt(parseOrderValue($cols[colIndex.registeredAt]), 10) * 1000,
+        registeredAt: new Date(
+          parseInt(parseOrderValue($cols[colIndex.registeredAt]), 10) * 1000
+        ),
         enchantmentLvl:
           colIndex.enchantmentLvl >= 0
             ? parseInt(parseOrderValue($cols[colIndex.enchantmentLvl]), 10)

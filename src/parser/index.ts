@@ -1,5 +1,6 @@
 import { Document } from 'mongoose';
 import formatDate from 'date-fns/format';
+import dateSub from 'date-fns/sub';
 import '../db/models/TgBotUser';
 import '../db/models/TgBotAccessKey';
 import '../db/models/ParseItem';
@@ -43,6 +44,7 @@ async function processTask(
     task.parseItem.parseId,
     task.serverId
   );
+  const aDayAgo = dateSub(new Date(), { days: 1 });
 
   for (const listing of listings) {
     const { ok, value, lastErrorObject } =
@@ -55,7 +57,7 @@ async function processTask(
           listingId: listing.id,
           serverId: task.serverId,
           sellerName: listing.sellerName,
-          registeredAt: new Date(listing.registeredAt),
+          registeredAt: listing.registeredAt,
           price: listing.price,
           amount: listing.amount,
           enchantmentLvl: listing.enchantmentLvl
@@ -76,6 +78,7 @@ async function processTask(
     if (ok === 0 || !value || !lastErrorObject) {
       throw { value, lastErrorObject };
     } else if (
+      listing.registeredAt > aDayAgo &&
       lastErrorObject.updatedExisting === false &&
       listing.price <= task.priceLimit &&
       validEnchantmentLevel
