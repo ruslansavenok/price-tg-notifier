@@ -123,14 +123,6 @@ export default async function startParser(workerId: number) {
     await sleep(3000);
     let task;
 
-    const transaction = Sentry.startTransaction({
-      op: 'parserJob',
-      name: 'Parser Job',
-      data: {
-        workerId
-      }
-    });
-
     try {
       task = await ParseItemSubscription.findOneAndUpdate(
         {
@@ -182,8 +174,6 @@ export default async function startParser(workerId: number) {
       }
       startParser(workerId);
       break;
-    } finally {
-      transaction.finish();
     }
   }
 }
