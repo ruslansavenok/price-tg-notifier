@@ -18,6 +18,8 @@
   "dependencies": {
     "@grammyjs/runner": "^1.0.2",
     "@grammyjs/transformer-throttler": "^1.0.1",
+    "@sentry/node": "^6.16.1",
+    "@sentry/tracing": "^6.16.1",
     "@types/minimist": "^1.2.2",
     "@types/qs": "^6.9.7",
     "axios": "^0.24.0",

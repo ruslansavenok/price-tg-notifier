@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+import * as Sentry from '@sentry/node';
 import formatDate from 'date-fns/format';
 import dateSub from 'date-fns/sub';
 import '../db/models/TgBotUser';
@@ -122,6 +123,14 @@ export default async function startParser(workerId: number) {
     await sleep(3000);
     let task;
 
+    const transaction = Sentry.startTransaction({
+      op: 'parserJob',
+      name: 'Parser Job',
+      data: {
+        workerId
+      }
+    });
+
     try {
       task = await ParseItemSubscription.findOneAndUpdate(
         {
@@ -154,12 +163,14 @@ export default async function startParser(workerId: number) {
         );
       }
     } catch (e) {
+      Sentry.captureException(e);
       console.log(e);
 
       if (task) {
         try {
           await markTaskParsed(task);
         } catch (e) {
+          Sentry.captureException(e);
           console.log(e);
         }
 
@@ -171,6 +182,8 @@ export default async function startParser(workerId: number) {
       }
       startParser(workerId);
       break;
+    } finally {
+      transaction.finish();
     }
   }
 }
