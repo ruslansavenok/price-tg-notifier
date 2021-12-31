@@ -157,7 +157,12 @@ export default async function startParser(workerId: number) {
       console.log(e);
 
       if (task) {
-        await markTaskParsed(task);
+        try {
+          await markTaskParsed(task);
+        } catch (e) {
+          console.log(e);
+        }
+
         logger.error(
           `Task crashed ${task.parseItem.parseId} for server=${serverNameFromId(
             task.serverId
