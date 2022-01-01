@@ -19,6 +19,7 @@ export const DATASOURCE_HOSTNAME = getEnvVariable('DATASOURCE_HOSTNAME');
 export const TELEGRAM_BOT_TOKEN = getEnvVariable('TELEGRAM_BOT_TOKEN');
 
 export const SENTRY_DSN = getEnvVariable('SENTRY_DSN', false);
+export const DATADOG_API_KEY = getEnvVariable('DATADOG_API_KEY', false);
 
 export const MAX_ITEM_PRICE = 99_000_000_000_000;
 

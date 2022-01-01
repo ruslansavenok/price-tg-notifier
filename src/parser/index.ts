@@ -111,16 +111,23 @@ async function markTaskParsed(
   await task.save();
 }
 
-export default async function startParser(workerId: number) {
-  await ParseItemSubscription.updateMany(
-    { currentWorkerId: workerId },
-    {
-      currentWorkerId: null
-    }
-  );
+export default async function startParser(workerId: number): Promise<any> {
+  try {
+    await ParseItemSubscription.updateMany(
+      { currentWorkerId: workerId },
+      {
+        currentWorkerId: null
+      }
+    );
+  } catch (e) {
+    console.log(`Failed to start worker, trying again in 3s...`);
+    await sleep(3000);
+    return startParser(workerId);
+  }
 
   while (true) {
-    await sleep(3000);
+    await sleep(1000);
+    const startedAtTs = new Date().getTime();
     let task;
 
     try {
@@ -172,8 +179,13 @@ export default async function startParser(workerId: number) {
           )}`
         );
       }
-      startParser(workerId);
-      break;
+
+      return startParser(workerId);
+    } finally {
+      logger.metric.gauge(
+        `parser.worker[${workerId}].taskDuration`,
+        new Date().getTime() - startedAtTs
+      );
     }
   }
 }
