@@ -14,8 +14,9 @@ const textLogger = createLogger({
 
 const metricsLogger = DATADOG_API_KEY
   ? new BufferedMetricsLogger({
+      apiHost: 'datadoghq.eu',
       apiKey: DATADOG_API_KEY,
-      flushIntervalSeconds: 60
+      flushIntervalSeconds: 15
     })
   : null;
 

@@ -39,11 +39,11 @@
   },
   "devDependencies": {
     "@grammyjs/types": "^2.3.1",
-    "@types/minimist": "^1.2.2",
-    "@types/qs": "^6.9.7",
     "@types/datadog-metrics": "^0.6.2",
     "@types/iconv": "^3.0.0",
+    "@types/minimist": "^1.2.2",
     "@types/node": "^16.11.6",
+    "@types/qs": "^6.9.7",
     "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",

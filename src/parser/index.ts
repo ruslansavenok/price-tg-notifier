@@ -126,7 +126,7 @@ export default async function startParser(workerId: number): Promise<any> {
   }
 
   while (true) {
-    await sleep(1000);
+    await sleep(2000);
     const startedAtTs = new Date().getTime();
     let task;
 
@@ -176,14 +176,14 @@ export default async function startParser(workerId: number): Promise<any> {
         logger.error(
           `Task crashed ${task.parseItem.parseId} for server=${serverNameFromId(
             task.serverId
-          )}`
+          )}, worker=${workerId}`
         );
       }
 
       return startParser(workerId);
     } finally {
       logger.metric.gauge(
-        `parser.worker[${workerId}].taskDuration`,
+        `parser.worker.${workerId}.taskDuration`,
         new Date().getTime() - startedAtTs
       );
     }
