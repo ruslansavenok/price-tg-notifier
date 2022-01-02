@@ -14,9 +14,10 @@ import {
 const invalidFormatMessage = (command: string) => `
 Invalid format:
 /${command} <itemUrlOrId>
--s (REQUIRED) serverName,serverName2
--p (default: MAX) Price in kk
--e (default: ANY) Enchantment Level
+-s  (REQUIRED) serverName,serverName2
+-p  (default: MAX) Price in kk
+-bp (default: -) Buy Price in kk
+-e  (default: ANY) Enchantment Level
 
 /${command} http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=48576 -s airin -p 100kk
 /${command} 48576 -s airin,elcardia
@@ -66,20 +67,27 @@ function handleSubsribeCommandFactory(command: string) {
       _: [itemUrlOrId],
       s: argServerNameOrNames,
       p: argPriceInkk,
+      bp: argBuyPriceInkk,
       e: argEnchantmentLevel
     } = parseArguments(args);
 
     const [isServerIdsValid, serverIds] = parseServerIds(argServerNameOrNames);
     const itemId = parseItemId(itemUrlOrId);
-    const price = argPriceInkk ? parsePrice(argPriceInkk) : MAX_ITEM_PRICE;
+    const buyPrice = argBuyPriceInkk ? parsePrice(argBuyPriceInkk) : undefined;
+    const price = argPriceInkk
+      ? parsePrice(argPriceInkk)
+      : buyPrice
+      ? undefined
+      : MAX_ITEM_PRICE;
     const minEnchantmentLevel =
       argEnchantmentLevel === undefined ? 0 : parseInt(argEnchantmentLevel, 10);
+    const priceValue = price || buyPrice;
 
     if (
-      isNaN(itemId) ||
-      isNaN(price) ||
+      typeof itemId !== 'number' ||
+      typeof priceValue !== 'number' ||
       !isServerIdsValid ||
-      isNaN(minEnchantmentLevel)
+      typeof minEnchantmentLevel !== 'number'
     ) {
       ctx.reply(invalidFormatMessage(command), {
         parse_mode: 'Markdown'
@@ -106,6 +114,7 @@ function handleSubsribeCommandFactory(command: string) {
           {
             serverId,
             priceLimit: price,
+            buyPriceLimit: buyPrice,
             minEnchantmentLevel,
             createdAt: new Date()
           },
@@ -116,7 +125,7 @@ function handleSubsribeCommandFactory(command: string) {
         );
         ctx.reply(
           `OK ${parseItem.title} - ${
-            price === MAX_ITEM_PRICE ? 'MAX' : price.toLocaleString()
+            priceValue === MAX_ITEM_PRICE ? 'MAX' : priceValue.toLocaleString()
           } - ${serverNameFromId(serverId)}`
         );
       }

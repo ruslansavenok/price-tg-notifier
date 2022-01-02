@@ -11,7 +11,9 @@ import {
 } from './utils';
 
 function renderResult(items: IParseItemSubscription[]) {
-  const result: (string | number)[][] = [['ID', 'Title', 'Price', 'Server']];
+  const result: (string | number)[][] = [
+    ['ID', 'Title', 'Price', 'Buy Price', 'Server']
+  ];
 
   items.forEach(item => {
     const enchStr =
@@ -22,7 +24,10 @@ function renderResult(items: IParseItemSubscription[]) {
       enchStr + item.parseItem.title,
       item.priceLimit === MAX_ITEM_PRICE
         ? 'MAX'
-        : item.priceLimit.toLocaleString(),
+        : item.priceLimit
+        ? item.priceLimit.toLocaleString()
+        : '-',
+      item.buyPriceLimit ? item.buyPriceLimit.toLocaleString() : '-',
       serverNameFromId(item.serverId)
     ];
     result.push(values);

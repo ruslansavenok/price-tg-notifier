@@ -22,7 +22,7 @@ if (SENTRY_DSN) {
   logger.info('Bot started...');
 
   for (const workerId of [1, 2, 3, 4]) {
-    startParser(workerId);
+    //startParser(workerId);
     logger.info(`Parser started for worker=${workerId}..`);
   }
 })();

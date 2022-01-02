@@ -6,7 +6,8 @@ export interface IParseItemSubscription {
   tgUser: ITgBotUser;
   parseItem: IParseItem;
   serverId: number;
-  priceLimit: number;
+  priceLimit: number | null;
+  buyPriceLimit: number | null;
   minEnchantmentLevel: number;
   lastParsedAt: Date;
   currentWorkerId: number | null;
@@ -32,6 +33,10 @@ const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
     index: true
   },
   priceLimit: {
+    type: Number,
+    required: true
+  },
+  buyPriceLimit: {
     type: Number,
     required: true
   },
