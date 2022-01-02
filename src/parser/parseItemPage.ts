@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Iconv } from 'iconv';
 import cherio, { Cheerio, Element } from 'cheerio';
-import { DATASOURCE_HOSTNAME } from '../../config';
+import { DATASOURCE_HOSTNAME, DATASOURCE_COOKIE } from '../../config';
 
 export interface IItemListing {
   id: number;
@@ -27,11 +27,22 @@ export const itemUrl = ({
 }) =>
   `http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=${itemId}&setworld=${serverId}`;
 
-async function fetchPageHtml(url: string): Promise<string> {
+async function fetchPageHtml(
+  url: string,
+  cookieWorld: number
+): Promise<string> {
+  const cookies = [`world=${cookieWorld};`];
+  if (DATASOURCE_COOKIE) {
+    cookies.push(`PHPSESSID=${DATASOURCE_COOKIE};`);
+  }
+
   const page = await axios(url, {
     method: 'GET',
     timeout: 3000,
     responseType: 'arraybuffer',
+    headers: {
+      Cookie: cookies.join(' ')
+    },
     transformResponse: function (data: Buffer) {
       const iconv = new Iconv('windows-1251', 'utf-8');
       data = iconv.convert(data);
@@ -55,11 +66,18 @@ async function parseItemPage(
   serverId: number
 ): Promise<IParseItemInfo> {
   const url = itemUrl({ itemId, serverId });
-  const urlHtml = await fetchPageHtml(url);
+  const urlHtml = await fetchPageHtml(url, serverId);
   const $ = cherio.load(urlHtml);
 
   if ($('#items-search').is('form')) {
     throw new Error(`Invalid ID for ${url}`);
+  }
+
+  const htmlServerId = $('#setworld-field option[selected]').attr('value');
+  if (htmlServerId && parseInt(htmlServerId, 10) !== serverId) {
+    throw new Error(
+      `Tryin to request server=${serverId} but got ${htmlServerId} url=${url}`
+    );
   }
 
   const title = $('#content h1').text();
