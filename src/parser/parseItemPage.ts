@@ -84,22 +84,24 @@ async function parseItemPage(
   const title = $('#content h1').text();
   const titleSup = $('#content h1 sup').text();
 
-  const columnNames = $('#group_sell thead tr th')
-    .toArray()
-    .map(e => $(e).text().toLowerCase());
-  const findIndexByHeaderName = (name: string): number =>
-    columnNames.findIndex(val => val === name);
-  const colIndex = {
-    playerName: findIndexByHeaderName('персонаж'),
-    playerLocation: findIndexByHeaderName('город'),
-    price: findIndexByHeaderName('цена'),
-    amount: findIndexByHeaderName('кол-во'),
-    registeredAt: findIndexByHeaderName('замечен'),
-    enchantmentLvl: findIndexByHeaderName('мод.')
-  };
-
   function getDataFromTable(selector: string) {
-    return $(selector)
+    const columnNames = $(`${selector} thead tr th`)
+      .toArray()
+      .map(e => $(e).text().toLowerCase());
+
+    const findIndexByHeaderName = (name: string): number =>
+      columnNames.findIndex(val => val === name);
+
+    const colIndex = {
+      playerName: findIndexByHeaderName('персонаж'),
+      playerLocation: findIndexByHeaderName('город'),
+      price: findIndexByHeaderName('цена'),
+      amount: findIndexByHeaderName('кол-во'),
+      registeredAt: findIndexByHeaderName('замечен'),
+      enchantmentLvl: findIndexByHeaderName('мод.')
+    };
+
+    return $(`${selector} tbody tr`)
       .toArray()
       .map(rowEl => {
         const $rowEl = $(rowEl);
@@ -132,8 +134,8 @@ async function parseItemPage(
       });
   }
 
-  const sellListings = getDataFromTable('#group_sell tbody tr');
-  const buyListings = getDataFromTable('#group_buy tbody tr');
+  const sellListings = getDataFromTable('#group_sell');
+  const buyListings = getDataFromTable('#group_buy');
 
   return {
     title: title.replace(titleSup, '').trim(),

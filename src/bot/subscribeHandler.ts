@@ -1,4 +1,5 @@
 import { Composer } from 'grammy';
+import * as Sentry from '@sentry/node';
 import parseArguments from 'minimist';
 import { DATASOURCE_HOSTNAME, SERVERS, MAX_ITEM_PRICE } from '../../config';
 import ParseItem from '../db/models/ParseItem';
@@ -92,6 +93,8 @@ function handleSubsribeCommandFactory(command: string) {
           const { title } = await parseItemPage(itemId, SERVERS.AIRIN);
           parseItem = await ParseItem.create({ parseId: itemId, title });
         } catch (e) {
+          console.log(e);
+          Sentry.captureException(e);
           return ctx.reply('Invalid <itemUrlOrId>');
         }
       }
