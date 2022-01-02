@@ -87,7 +87,11 @@ async function processTask(
             ? listing.enchantmentLvl >= subscription.minEnchantmentLevel
             : true;
 
-        if (listing.price <= subscription.priceLimit && validEnchantmentLevel) {
+        if (
+          listing.price <= subscription.priceLimit &&
+          listing.registeredAt >= subscription.createdAt &&
+          validEnchantmentLevel
+        ) {
           await bot.api.sendMessage(
             subscription.tgUser.tgUserId,
             newListingMessage(subscription, value),

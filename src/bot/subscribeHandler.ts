@@ -106,7 +106,8 @@ function handleSubsribeCommandFactory(command: string) {
           {
             serverId,
             priceLimit: price,
-            minEnchantmentLevel
+            minEnchantmentLevel,
+            createdAt: new Date()
           },
           {
             new: true,

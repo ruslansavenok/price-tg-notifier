@@ -10,6 +10,7 @@ export interface IParseItemSubscription {
   minEnchantmentLevel: number;
   lastParsedAt: Date;
   currentWorkerId: number | null;
+  createdAt: Date;
 }
 
 const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
@@ -43,6 +44,10 @@ const ParseItemSubscriptionSchema = new Schema<IParseItemSubscription>({
   },
   currentWorkerId: {
     type: Number
+  },
+  createdAt: {
+    type: Date,
+    index: true
   }
 });
 
