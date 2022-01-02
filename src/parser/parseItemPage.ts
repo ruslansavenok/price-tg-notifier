@@ -5,8 +5,8 @@ import { DATASOURCE_HOSTNAME, DATASOURCE_COOKIE } from '../../config';
 
 export interface IItemListing {
   id: number;
-  sellerName: string;
-  sellerLocation: string;
+  playerName: string;
+  playerLocation: string;
   price: number;
   registeredAt: Date;
   amount?: number;
@@ -15,7 +15,8 @@ export interface IItemListing {
 
 export interface IParseItemInfo {
   title: string;
-  listings: IItemListing[];
+  sellListings: IItemListing[];
+  buyListings: IItemListing[];
 }
 
 export const itemUrl = ({
@@ -89,49 +90,55 @@ async function parseItemPage(
   const findIndexByHeaderName = (name: string): number =>
     columnNames.findIndex(val => val === name);
   const colIndex = {
-    sellerName: findIndexByHeaderName('персонаж'),
-    sellerLocation: findIndexByHeaderName('город'),
+    playerName: findIndexByHeaderName('персонаж'),
+    playerLocation: findIndexByHeaderName('город'),
     price: findIndexByHeaderName('цена'),
     amount: findIndexByHeaderName('кол-во'),
     registeredAt: findIndexByHeaderName('замечен'),
     enchantmentLvl: findIndexByHeaderName('мод.')
   };
 
-  const listings = $('#group_sell tbody tr')
-    .toArray()
-    .map(rowEl => {
-      const $rowEl = $(rowEl);
-      const rowClasses = $rowEl.attr('class');
-      if (!rowClasses) throw new Error('Invalid page!');
+  function getDataFromTable(selector: string) {
+    return $(selector)
+      .toArray()
+      .map(rowEl => {
+        const $rowEl = $(rowEl);
+        const rowClasses = $rowEl.attr('class');
+        if (!rowClasses) throw new Error('Invalid page!');
 
-      const id = rowClasses.split(' ')[0].replace('shop-', '');
-      const $cols = $(rowEl)
-        .find('td')
-        .toArray()
-        .map(el => $(el));
+        const id = rowClasses.split(' ')[0].replace('shop-', '');
+        const $cols = $(rowEl)
+          .find('td')
+          .toArray()
+          .map(el => $(el));
 
-      return {
-        id: parseInt(id, 10),
-        sellerName: $cols[colIndex.sellerName].text(),
-        sellerLocation: $cols[colIndex.sellerLocation].text(),
-        price: parseInt(parseOrderValue($cols[colIndex.price]), 10),
-        amount:
-          colIndex.amount >= 0
-            ? parseInt(parseOrderValue($cols[colIndex.amount]), 10)
-            : undefined,
-        registeredAt: new Date(
-          parseInt(parseOrderValue($cols[colIndex.registeredAt]), 10) * 1000
-        ),
-        enchantmentLvl:
-          colIndex.enchantmentLvl >= 0
-            ? parseInt(parseOrderValue($cols[colIndex.enchantmentLvl]), 10)
-            : undefined
-      };
-    });
+        return {
+          id: parseInt(id, 10),
+          playerName: $cols[colIndex.playerName].text(),
+          playerLocation: $cols[colIndex.playerLocation].text(),
+          price: parseInt(parseOrderValue($cols[colIndex.price]), 10),
+          amount:
+            colIndex.amount >= 0
+              ? parseInt(parseOrderValue($cols[colIndex.amount]), 10)
+              : undefined,
+          registeredAt: new Date(
+            parseInt(parseOrderValue($cols[colIndex.registeredAt]), 10) * 1000
+          ),
+          enchantmentLvl:
+            colIndex.enchantmentLvl >= 0
+              ? parseInt(parseOrderValue($cols[colIndex.enchantmentLvl]), 10)
+              : undefined
+        };
+      });
+  }
+
+  const sellListings = getDataFromTable('#group_sell tbody tr');
+  const buyListings = getDataFromTable('#group_buy tbody tr');
 
   return {
     title: title.replace(titleSup, '').trim(),
-    listings
+    sellListings,
+    buyListings
   };
 }
 export default parseItemPage;

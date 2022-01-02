@@ -1,6 +1,7 @@
 import TgBotUser from '../db/models/TgBotUser';
 import TgBotAccessKey from '../db/models/TgBotAccessKey';
 import ParseItemSubscription from './models/ParseItemSubscription';
+import ParseItemListing, { LISTING_TYPE } from './models/ParseItemListing';
 import logger from '../logger';
 
 const createLogger = (fnName: string) => (str: string) =>
@@ -11,6 +12,7 @@ const createLogger = (fnName: string) => (str: string) =>
 async function normalizeDB() {
   await dec20_2021_fix_access_key_assignments();
   await jan2_2022_fix_parse_item_subsription_created_at();
+  await jan2_2022_change_listing_fields();
 }
 
 // Legacy logins which didn't update accessKey assignments
@@ -49,6 +51,22 @@ async function jan2_2022_fix_parse_item_subsription_created_at() {
       createdAt: new Date(new Date().getTime() - 1000 * 60 * 60)
     }
   );
+  log(`Found ${res.matchedCount}, updated ${res.modifiedCount}`);
+}
+
+async function jan2_2022_change_listing_fields() {
+  const log = createLogger('jan2_2022_change_listing_fields');
+
+  const res = await ParseItemListing.updateMany(
+    {
+      type: {
+        $exists: false
+      }
+    },
+    { $rename: { sellerName: 'playerName' }, type: LISTING_TYPE.SELL },
+    { multi: true }
+  );
+
   log(`Found ${res.matchedCount}, updated ${res.modifiedCount}`);
 }
 

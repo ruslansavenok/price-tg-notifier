@@ -1,10 +1,17 @@
 import { Schema, model } from 'mongoose';
 
+export enum LISTING_TYPE {
+  BUY = 'buy',
+  SELL = 'sell'
+}
+
 export interface IParseItemlisting {
   parseItem: Schema.Types.ObjectId;
   listingId: number;
+  type: LISTING_TYPE;
   serverId: number;
-  sellerName: string;
+  sellerName: string; // TODO: remove legacy
+  playerName: string;
   registeredAt: Date;
   price: number;
   amount?: number;
@@ -21,12 +28,24 @@ const ParseItemListingSchema = new Schema<IParseItemlisting>({
     required: true,
     index: true
   },
+  type: {
+    type: String,
+    enum: Object.values(LISTING_TYPE),
+    required: true,
+    index: true
+  },
   serverId: {
     type: Number,
     required: true,
     index: true
   },
+  // TODO: remove legacy
   sellerName: {
+    type: String,
+    required: true,
+    index: true
+  },
+  playerName: {
     type: String,
     required: true,
     index: true
