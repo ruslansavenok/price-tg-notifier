@@ -89,10 +89,33 @@ export default async function startParser(workerId: number): Promise<any> {
     return startParser(workerId);
   }
 
+  let tickStartedAt: any;
+  let tickInterval: any;
+
   while (true) {
     await sleep(2000);
     const startedAtTs = new Date().getTime();
-    let task;
+    let task:
+      | (Document<any, any, IParseItemSubscription> & IParseItemSubscription)
+      | undefined;
+
+    // TODO:
+    // Trying to get some clues on when and why while loop get stuck
+    tickStartedAt = new Date().getTime();
+    clearInterval(tickInterval);
+    tickInterval = setInterval(() => {
+      const ts = new Date().getTime();
+
+      if (ts - tickStartedAt > 1000 * 60 * 2) {
+        Sentry.captureMessage(`Parser tick is taking too long`, {
+          extra: {
+            workerId,
+            task: task ? JSON.stringify(task) : null
+          }
+        });
+        clearInterval(tickInterval);
+      }
+    }, 5000);
 
     try {
       task = await ParseItemSubscription.findOneAndUpdate(
