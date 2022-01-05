@@ -1,5 +1,6 @@
 import { Composer } from 'grammy';
 import { table } from 'table';
+import chunk from 'lodash/chunk';
 import { MAX_ITEM_PRICE } from '../../config';
 import ParseItemSubscription, {
   IParseItemSubscription
@@ -10,8 +11,12 @@ import {
   serverNameFromId
 } from './utils';
 
-function renderResult(items: IParseItemSubscription[]) {
-  const result: (string | number)[][] = [['ID', 'Title', 'Price', 'Server']];
+function renderResult(items: IParseItemSubscription[], withHeader = true) {
+  const result: (string | number)[][] = [];
+
+  if (withHeader) {
+    result.push(['ID', 'Title', 'Price', 'Server']);
+  }
 
   items.forEach(item => {
     const enchStr =
@@ -43,7 +48,11 @@ function handleListCommandFactory(command: string) {
       tgUser: user
     }).populate('parseItem');
 
-    ctx.reply(renderResult(itemSubscriptions), { parse_mode: 'Markdown' });
+    chunk(itemSubscriptions, 15).forEach((group, i) => {
+      ctx.reply(renderResult(group, i === 0 ? true : false), {
+        parse_mode: 'Markdown'
+      });
+    });
   });
 
   return bot;
