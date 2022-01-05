@@ -161,7 +161,7 @@ export default async function startParser(workerId: number): Promise<any> {
         );
       } else {
         Sentry.addBreadcrumb({
-          message: `No task found ${task._id}`,
+          message: `No task found`,
           level: Sentry.Severity.Info
         });
         continue;
