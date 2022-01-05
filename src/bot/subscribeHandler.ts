@@ -24,8 +24,7 @@ Invalid format:
 /${command} 48576 -s airin -p 100kk
 `;
 
-function parsePrice(rawValue: any): number {
-  const value = rawValue.toString();
+function parsePrice(value: string): number {
   const kRegex = /k/g;
 
   const kMatch = value.match(kRegex);
@@ -70,7 +69,9 @@ function handleSubsribeCommandFactory(command: string) {
       s: argServerNameOrNames,
       p: argPriceInkk,
       e: argEnchantmentLevel
-    } = parseArguments(args);
+    } = parseArguments(args, {
+      string: ['s', 'p', 'e']
+    });
 
     const [isServerIdsValid, serverIds] = parseServerIds(argServerNameOrNames);
     const itemId = parseItemId(itemUrlOrId);

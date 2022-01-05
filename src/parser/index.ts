@@ -49,7 +49,7 @@ async function processTask(
         listing.registeredAt >= subscription.createdAt &&
         validEnchantmentLevel
       ) {
-        await bot.api.sendMessage(
+        bot.api.sendMessage(
           subscription.tgUser.tgUserId,
           newListingMessage(subscription, listing),
           {
