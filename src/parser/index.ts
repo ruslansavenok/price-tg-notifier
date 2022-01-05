@@ -110,7 +110,9 @@ export default async function startParser(workerId: number): Promise<any> {
         Sentry.captureMessage(`Parser tick is taking too long`, {
           extra: {
             workerId,
-            task: task ? JSON.stringify(task) : null
+            task: task ? JSON.stringify(task) : null,
+            startedAtTs,
+            now: new Date().getTime()
           }
         });
         clearInterval(tickInterval);
@@ -118,6 +120,11 @@ export default async function startParser(workerId: number): Promise<any> {
     }, 5000);
 
     try {
+      Sentry.addBreadcrumb({
+        message: 'Try to find a task',
+        level: Sentry.Severity.Info
+      });
+
       task = await ParseItemSubscription.findOneAndUpdate(
         {
           currentWorkerId: null
@@ -140,6 +147,11 @@ export default async function startParser(workerId: number): Promise<any> {
       ]);
 
       if (task && task.tgUser.accessCode.expireAt > new Date()) {
+        Sentry.addBreadcrumb({
+          message: `Task found ${task._id}, processing...`,
+          level: Sentry.Severity.Info
+        });
+
         await processTask(task);
         await markTaskParsed(task);
         logger.info(
@@ -147,6 +159,12 @@ export default async function startParser(workerId: number): Promise<any> {
             task.serverId
           )}, worker=${workerId}`
         );
+      } else {
+        Sentry.addBreadcrumb({
+          message: `No task found ${task._id}`,
+          level: Sentry.Severity.Info
+        });
+        continue;
       }
     } catch (e) {
       Sentry.captureException(e);
