@@ -24,8 +24,10 @@ Invalid format:
 /${command} 48576 -s airin -p 100kk
 `;
 
-function parsePrice(value: string): number {
+function parsePrice(rawValue: any): number {
+  const value = rawValue.toString();
   const kRegex = /k/g;
+
   const kMatch = value.match(kRegex);
 
   if (kMatch) {
