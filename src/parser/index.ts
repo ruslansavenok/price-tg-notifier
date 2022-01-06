@@ -187,6 +187,7 @@ export default async function startParser(workerId: number): Promise<any> {
 
       return startParser(workerId);
     } finally {
+      clearInterval(tickInterval);
       logger.metric.gauge(
         `parser.worker.${workerId}.taskDuration`,
         new Date().getTime() - startedAtTs
