@@ -54,6 +54,7 @@ async function processTask(
           : true;
 
       if (
+        typeof subscription.priceLimit === 'number' &&
         listing.price <= subscription.priceLimit &&
         listing.registeredAt >= subscription.createdAt &&
         validEnchantmentLevel

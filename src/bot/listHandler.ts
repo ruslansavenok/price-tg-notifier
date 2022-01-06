@@ -5,6 +5,7 @@ import { MAX_ITEM_PRICE } from '../../config';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
+import { formatPrice } from '../format';
 import {
   parseMessageData,
   isValidSubscription,
@@ -15,7 +16,7 @@ function renderResult(items: IParseItemSubscription[], withHeader = true) {
   const result: (string | number)[][] = [];
 
   if (withHeader) {
-    result.push(['ID', 'Title', 'Price', 'Server']);
+    result.push(['ID', 'Title', 'Sell Price', 'Buy Price', 'Server']);
   }
 
   items.forEach(item => {
@@ -25,9 +26,12 @@ function renderResult(items: IParseItemSubscription[], withHeader = true) {
     const values = [
       item.parseItem.parseId,
       enchStr + item.parseItem.title,
-      item.priceLimit === MAX_ITEM_PRICE
-        ? 'MAX'
-        : item.priceLimit.toLocaleString(),
+      item.priceLimit
+        ? item.priceLimit === MAX_ITEM_PRICE
+          ? 'MAX'
+          : formatPrice(item.priceLimit)
+        : '-',
+      item.buyPriceLimit ? formatPrice(item.buyPriceLimit) : '-',
       serverNameFromId(item.serverId)
     ];
     result.push(values);

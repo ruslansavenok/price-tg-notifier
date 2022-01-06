@@ -5,6 +5,7 @@ import { DATASOURCE_HOSTNAME, SERVERS, MAX_ITEM_PRICE } from '../../config';
 import ParseItem from '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
 import parseItemPage from '../parser/parseItemPage';
+import { parsePrice, formatPrice } from '../format';
 import {
   parseMessageData,
   isValidSubscription,
@@ -23,20 +24,6 @@ Invalid format:
 /${command} 48576 -s airin,elcardia
 /${command} 48576 -s airin -p 100kk
 `;
-
-function parsePrice(value: string): number {
-  const kRegex = /k/g;
-  const kMatch = value.match(kRegex);
-
-  if (kMatch) {
-    const valueWithoutK = parseFloat(
-      parseFloat(value.replace(kRegex, '')).toFixed(kMatch.length)
-    );
-    return valueWithoutK * Math.pow(1000, kMatch.length);
-  } else {
-    return parseInt(value, 10);
-  }
-}
 
 function parseServerIds(serverNameOrNames: string = ''): [boolean, number[]] {
   let isValidFormat = true;
@@ -121,7 +108,7 @@ function handleSubsribeCommandFactory(command: string) {
         );
         ctx.reply(
           `OK ${parseItem.title} - ${
-            price === MAX_ITEM_PRICE ? 'MAX' : price.toLocaleString()
+            price === MAX_ITEM_PRICE ? 'MAX' : formatPrice(price)
           } - ${serverNameFromId(serverId)}`
         );
       }
