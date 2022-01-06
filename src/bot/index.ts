@@ -1,4 +1,5 @@
 import { Bot, GrammyError, HttpError } from 'grammy';
+import * as Sentry from '@sentry/node';
 import { generateUpdateMiddleware } from 'telegraf-middleware-console-time';
 import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { run } from '@grammyjs/runner';
@@ -22,10 +23,12 @@ bot.use(listHandler('list'));
 bot.use(adminGenKeyHandler('adminGenKey'));
 bot.use(adminListKeysHandler('adminListKeys'));
 
-bot.catch(err => {
-  const ctx = err.ctx;
+bot.catch(({ ctx, error: e }) => {
   console.error(`Error while handling update ${ctx.update.update_id}:`);
-  const e = err.error;
+  Sentry.captureException(e);
+
+  ctx.reply('Unknown Error :/');
+
   if (e instanceof GrammyError) {
     console.error('Error in request:', e.description);
   } else if (e instanceof HttpError) {

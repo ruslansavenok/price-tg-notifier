@@ -26,7 +26,6 @@ Invalid format:
 
 function parsePrice(value: string): number {
   const kRegex = /k/g;
-
   const kMatch = value.match(kRegex);
 
   if (kMatch) {
