@@ -24,6 +24,11 @@ async function processTask(
     task.parseItem.parseId,
     task.serverId
   );
+  Sentry.addBreadcrumb({
+    message: `Page parsed ${task.parseItem.parseId}`,
+    level: Sentry.Severity.Info
+  });
+
   const allSubscriptionsForGivenServer = await ParseItemSubscription.find({
     parseItem: task.parseItem,
     serverId: task.serverId
@@ -35,6 +40,10 @@ async function processTask(
       LISTING_TYPE.SELL,
       rawListing
     );
+    Sentry.addBreadcrumb({
+      message: `Processed sell listing task=${task.parseItem.parseId}, listing=${listing.listingId}, isNew=${isNew}`,
+      level: Sentry.Severity.Info
+    });
     if (!isNew) continue;
 
     for (const subscription of allSubscriptionsForGivenServer) {
@@ -64,6 +73,10 @@ async function processTask(
 
   for (const rawListing of buyListings) {
     await processListing(task, LISTING_TYPE.BUY, rawListing);
+    Sentry.addBreadcrumb({
+      message: `Processed buy listing task=${task.parseItem.parseId}, listing=${rawListing.id}`,
+      level: Sentry.Severity.Info
+    });
   }
 }
 
@@ -148,7 +161,7 @@ export default async function startParser(workerId: number): Promise<any> {
 
       if (task && task.tgUser.accessCode.expireAt > new Date()) {
         Sentry.addBreadcrumb({
-          message: `Task found ${task._id}, processing...`,
+          message: `Task found ${task.parseItem.parseId}, processing...`,
           level: Sentry.Severity.Info
         });
 
