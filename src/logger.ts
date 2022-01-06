@@ -20,6 +20,17 @@ const metricsLogger = DATADOG_API_KEY
     })
   : null;
 
+const logMetricFn =
+  <TMetricType extends keyof BufferedMetricsLogger>(metricType: TMetricType) =>
+  (...args: Parameters<BufferedMetricsLogger[TMetricType]>) => {
+    if (metricsLogger) {
+      // @ts-expect-error
+      metricsLogger[metricType](...args);
+    } else {
+      textLogger.info(args.join(' - '));
+    }
+  };
+
 const executeMetric = (fn: Function | undefined, args: any) => {
   if (fn) {
     fn.apply(metricsLogger, args);
@@ -32,13 +43,9 @@ export default {
   info: textLogger.info.bind(textLogger),
   error: textLogger.error.bind(textLogger),
   metric: {
-    gauge: (...args: Parameters<BufferedMetricsLogger['gauge']>) =>
-      executeMetric(metricsLogger?.gauge, args),
-    increment: (...args: Parameters<BufferedMetricsLogger['increment']>) =>
-      executeMetric(metricsLogger?.increment, args),
-    histogram: (...args: Parameters<BufferedMetricsLogger['histogram']>) =>
-      executeMetric(metricsLogger?.histogram, args),
-    flush: (...args: Parameters<BufferedMetricsLogger['flush']>) =>
-      executeMetric(metricsLogger?.flush, args)
+    gauge: logMetricFn('gauge'),
+    increment: logMetricFn('increment'),
+    histogram: logMetricFn('histogram'),
+    flush: logMetricFn('flush')
   }
 };
