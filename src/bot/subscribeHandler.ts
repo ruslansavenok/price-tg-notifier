@@ -5,7 +5,7 @@ import { DATASOURCE_HOSTNAME, SERVERS, MAX_ITEM_PRICE } from '../../config';
 import ParseItem from '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
 import parseItemPage from '../parser/parseItemPage';
-import { parsePrice, formatPrice } from '../format';
+import { parsePrice } from '../format';
 import {
   parseMessageData,
   isValidSubscription,

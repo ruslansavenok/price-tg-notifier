@@ -5,7 +5,6 @@ import { MAX_ITEM_PRICE } from '../../config';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
-import { formatPrice } from '../format';
 import {
   parseMessageData,
   isValidSubscription,
@@ -16,22 +15,27 @@ function renderResult(items: IParseItemSubscription[], withHeader = true) {
   const result: (string | number)[][] = [];
 
   if (withHeader) {
-    result.push(['ID', 'Title', 'Sell Price', 'Buy Price', 'Server']);
+    result.push(['ID', 'Title', 'Sell/Buy Price', 'Server']);
   }
 
   items.forEach(item => {
     const enchStr =
       item.minEnchantmentLevel > 0 ? `(+${item.minEnchantmentLevel}) ` : '';
 
-    const values = [
-      item.parseItem.parseId,
-      enchStr + item.parseItem.title,
+    const sellBuyPrice = [
       item.priceLimit
         ? item.priceLimit === MAX_ITEM_PRICE
           ? 'MAX'
           : item.priceLimit.toLocaleString()
-        : '-',
-      item.buyPriceLimit ? item.buyPriceLimit.toLocaleString() : '-',
+        : '-'
+    ];
+    if (item.buyPriceLimit)
+      sellBuyPrice.push(item.buyPriceLimit.toLocaleString());
+
+    const values = [
+      item.parseItem.parseId,
+      enchStr + item.parseItem.title,
+      sellBuyPrice.join(' / '),
       serverNameFromId(item.serverId)
     ];
     result.push(values);
