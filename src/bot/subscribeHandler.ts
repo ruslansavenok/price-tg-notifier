@@ -108,7 +108,7 @@ function handleSubsribeCommandFactory(command: string) {
         );
         ctx.reply(
           `OK ${parseItem.title} - ${
-            price === MAX_ITEM_PRICE ? 'MAX' : formatPrice(price)
+            price === MAX_ITEM_PRICE ? 'MAX' : price.toLocaleString()
           } - ${serverNameFromId(serverId)}`
         );
       }

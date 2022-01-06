@@ -29,9 +29,9 @@ function renderResult(items: IParseItemSubscription[], withHeader = true) {
       item.priceLimit
         ? item.priceLimit === MAX_ITEM_PRICE
           ? 'MAX'
-          : formatPrice(item.priceLimit)
+          : item.priceLimit.toLocaleString()
         : '-',
-      item.buyPriceLimit ? formatPrice(item.buyPriceLimit) : '-',
+      item.buyPriceLimit ? item.buyPriceLimit.toLocaleString() : '-',
       serverNameFromId(item.serverId)
     ];
     result.push(values);
