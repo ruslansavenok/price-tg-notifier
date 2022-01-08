@@ -4,6 +4,20 @@ import logger from '../logger';
 
 let runtimeCookie: string | undefined;
 
+// NOTE:
+// Force swap cookie in runtime if admin changes it in mongo
+// (works because datasoruce doesn't not send set-cookie on every request)
+setInterval(async () => {
+  const configRecord = await DataSourceConfig.findOne({});
+  if (
+    configRecord &&
+    configRecord.sessionCookie &&
+    configRecord.sessionCookie !== runtimeCookie
+  ) {
+    runtimeCookie = configRecord.sessionCookie;
+  }
+}, 30 * 1000);
+
 export async function getSessionCookie() {
   if (!runtimeCookie) {
     try {
