@@ -72,13 +72,14 @@ export async function processTask(
     if (existingListingsById[listing.id]) continue;
 
     const newRecord = await ParseItemListing.create({
-      parsedItem: task.parseItem._id,
+      parseItem: task.parseItem._id,
       serverId: task.serverId,
       type: listing.type,
       listingId: listing.id,
       playerName: listing.playerName,
       registeredAt: listing.registeredAt,
       price: listing.price,
+      amount: listing.amount,
       enchantmentLvl: listing.enchantmentLvl
     });
 
