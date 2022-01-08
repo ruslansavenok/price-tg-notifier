@@ -9,4 +9,5 @@ TODO
 - unit tests
 - test ideas of improving parser speed
 - reduce DB size by removing unneded indexes
+- parser price with ,
 ```

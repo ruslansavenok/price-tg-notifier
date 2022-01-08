@@ -129,9 +129,8 @@ export default async function startParser(workerId: number): Promise<any> {
             now: new Date().getTime()
           }
         });
-        clearInterval(tickInterval);
       }
-    }, 5000);
+    }, 2 * 60 * 1000);
 
     try {
       Sentry.addBreadcrumb({
