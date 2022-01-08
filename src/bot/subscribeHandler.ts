@@ -16,9 +16,10 @@ import {
 const invalidFormatMessage = (command: string) => `
 Invalid format:
 /${command} <itemUrlOrId>
--s (REQUIRED) serverName,serverName2
--p (default: MAX) Price in kk
--e (default: ANY) Enchantment Level
+-s  (REQUIRED) serverName,serverName2
+-p  (default: MAX) Price in kk
+-bp (default: -) Buy Price in kk
+-e  (default: ANY) Enchantment Level
 
 /${command} http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=48576 -s airin -p 100kk
 /${command} 48576 -s airin,elcardia
@@ -54,22 +55,28 @@ function handleSubsribeCommandFactory(command: string) {
       _: [itemUrlOrId],
       s: argServerNameOrNames,
       p: argPriceInkk,
+      bp: argBuyPriceInkk,
       e: argEnchantmentLevel
     } = parseArguments(args, {
-      string: ['s', 'p', 'e']
+      string: ['s', 'p', 'bp', 'e']
     });
 
     const [isServerIdsValid, serverIds] = parseServerIds(argServerNameOrNames);
     const itemId = parseItemId(itemUrlOrId);
-    const price = argPriceInkk ? parsePrice(argPriceInkk) : MAX_ITEM_PRICE;
+    const buyPrice = argBuyPriceInkk ? parsePrice(argBuyPriceInkk) : undefined;
+    const price = argPriceInkk
+      ? parsePrice(argPriceInkk)
+      : typeof buyPrice !== 'number'
+      ? undefined
+      : MAX_ITEM_PRICE;
     const minEnchantmentLevel =
       argEnchantmentLevel === undefined ? 0 : parseInt(argEnchantmentLevel, 10);
 
     if (
-      isNaN(itemId) ||
-      isNaN(price) ||
+      typeof itemId !== 'number' ||
+      (typeof price !== 'number' && typeof buyPrice !== 'number') ||
       !isServerIdsValid ||
-      isNaN(minEnchantmentLevel)
+      typeof minEnchantmentLevel !== 'number'
     ) {
       ctx.reply(invalidFormatMessage(command), {
         parse_mode: 'Markdown'
@@ -98,6 +105,7 @@ function handleSubsribeCommandFactory(command: string) {
           {
             serverId,
             priceLimit: price,
+            buyPriceLimit: buyPrice,
             minEnchantmentLevel,
             createdAt: new Date()
           },
@@ -106,10 +114,17 @@ function handleSubsribeCommandFactory(command: string) {
             upsert: true
           }
         );
+        const prices = [];
+        if (price)
+          prices.push(
+            `SELL: ${price === MAX_ITEM_PRICE ? 'MAX' : price.toLocaleString()}`
+          );
+        if (buyPrice) prices.push(`BUY: ${buyPrice.toLocaleString()}`);
+
         ctx.reply(
-          `OK ${parseItem.title} - ${
-            price === MAX_ITEM_PRICE ? 'MAX' : price.toLocaleString()
-          } - ${serverNameFromId(serverId)}`
+          `OK ${parseItem.title} - ${prices.join(', ')} - ${serverNameFromId(
+            serverId
+          )}`
         );
       }
     }

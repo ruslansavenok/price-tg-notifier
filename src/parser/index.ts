@@ -73,11 +73,34 @@ async function processTask(
   }
 
   for (const rawListing of buyListings) {
-    await processListing(task, LISTING_TYPE.BUY, rawListing);
     Sentry.addBreadcrumb({
       message: `Processed buy listing task=${task.parseItem.parseId}, listing=${rawListing.id}`,
       level: Sentry.Severity.Info
     });
+    const { isNew, listing } = await processListing(
+      task,
+      LISTING_TYPE.BUY,
+      rawListing
+    );
+    if (!isNew) continue;
+
+    for (const subscription of allSubscriptionsForGivenServer) {
+      if (
+        typeof subscription.buyPriceLimit === 'number' &&
+        listing.price >= subscription.buyPriceLimit &&
+        listing.registeredAt >= subscription.createdAt
+      ) {
+        bot.api.sendMessage(
+          subscription.tgUser.tgUserId,
+          newListingMessage(subscription, listing),
+          {
+            parse_mode: 'Markdown'
+          }
+        );
+        subscription.lastParsedAt = new Date();
+        await subscription.save();
+      }
+    }
   }
 }
 

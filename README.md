@@ -10,4 +10,5 @@ TODO
 - test ideas of improving parser speed
 - reduce DB size by removing unneded indexes
 - parser price with ,
+- store DATASOURCE_COOKIE in db and refresh it on requests
 ```

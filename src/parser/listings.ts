@@ -15,10 +15,12 @@ export const newListingMessage = (
 ) => `🚨🚨
 *Title:* ${task.parseItem.title}
 *Price:* ${listing.price.toLocaleString()}
+*${listing.type === LISTING_TYPE.SELL ? 'SELLER' : 'BUYER'}:* ${
+  listing.playerName
+}
 *Amount:* ${listing.amount ? listing.amount.toLocaleString() : '-'}
 *Added At:* ${formatDate(listing.registeredAt, 'MM/dd/yyyy - HH:mm')}
 *ENH:* ${listing.enchantmentLvl ? `+${listing.enchantmentLvl}` : '-'}
-*SELLER:* ${listing.playerName}
 *ID:* ${listing.listingId}
 *SERVER:* ${serverNameFromId(task.serverId)}
 [OPEN L2ON](${itemUrl({

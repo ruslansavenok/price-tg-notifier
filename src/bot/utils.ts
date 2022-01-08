@@ -13,7 +13,10 @@ export async function parseMessageData(ctx: Context):
   if (!ctx.message?.from) throw new Error('Invalid ctx');
 
   const user = await findAnSyncTgBotUser(ctx.message.from);
-  const args = (ctx.match as string).toLowerCase().split(' ');
+  const args = (ctx.match as string)
+    .toLowerCase()
+    .split(' ')
+    .map(v => (v.startsWith('-') ? `-${v}` : v));
 
   return {
     user,
