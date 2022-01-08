@@ -67,8 +67,8 @@ function handleSubsribeCommandFactory(command: string) {
     const price = argPriceInkk
       ? parsePrice(argPriceInkk)
       : typeof buyPrice !== 'number'
-      ? undefined
-      : MAX_ITEM_PRICE;
+      ? MAX_ITEM_PRICE
+      : undefined;
     const minEnchantmentLevel =
       argEnchantmentLevel === undefined ? 0 : parseInt(argEnchantmentLevel, 10);
 
