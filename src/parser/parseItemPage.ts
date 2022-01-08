@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { Iconv } from 'iconv';
+import cookie from 'cookie';
 import cherio, { Cheerio, Element } from 'cheerio';
-import { DATASOURCE_HOSTNAME, DATASOURCE_COOKIE } from '../../config';
+import { DATASOURCE_HOSTNAME } from '../../config';
+import { getSessionCookie, setSessionCookie } from '../db/datasourceConfig';
 
 export interface IItemListing {
   id: number;
@@ -33,8 +35,9 @@ async function fetchPageHtml(
   cookieWorld: number
 ): Promise<string> {
   const cookies = [`world=${cookieWorld};`];
-  if (DATASOURCE_COOKIE) {
-    cookies.push(`PHPSESSID=${DATASOURCE_COOKIE};`);
+  const sessionCookie = await getSessionCookie();
+  if (sessionCookie) {
+    cookies.push(`PHPSESSID=${sessionCookie};`);
   }
 
   const page = await axios(url, {
@@ -50,6 +53,14 @@ async function fetchPageHtml(
       return data.toString();
     }
   });
+
+  (page.headers['set-cookie'] || []).forEach(str => {
+    const { PHPSESSID } = cookie.parse(str);
+    if (PHPSESSID) {
+      setSessionCookie(PHPSESSID);
+    }
+  });
+
   return page.data;
 }
 

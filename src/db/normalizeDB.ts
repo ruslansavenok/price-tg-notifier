@@ -9,6 +9,7 @@ const createLogger = (fnName: string) => (str: string) =>
 
 // NOTE:
 // Fixes DB artifacts on startup (caused by old code)
+// TODO: replace with mongo-migrate
 async function normalizeDB() {
   await dec20_2021_fix_access_key_assignments();
   await jan2_2022_fix_parse_item_subsription_created_at();
