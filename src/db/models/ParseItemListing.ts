@@ -7,10 +7,9 @@ export enum LISTING_TYPE {
 
 export interface IParseItemlisting {
   parseItem: Schema.Types.ObjectId;
-  listingId: number;
+  listingId: string;
   type: LISTING_TYPE;
   serverId: number;
-  sellerName: string; // TODO: remove legacy
   playerName: string;
   registeredAt: Date;
   price: number;
@@ -24,7 +23,7 @@ const ParseItemListingSchema = new Schema<IParseItemlisting>({
     ref: 'parse_item'
   },
   listingId: {
-    type: Number,
+    type: String,
     required: true,
     index: true
   },
@@ -36,12 +35,6 @@ const ParseItemListingSchema = new Schema<IParseItemlisting>({
   },
   serverId: {
     type: Number,
-    required: true,
-    index: true
-  },
-  // TODO: remove legacy
-  sellerName: {
-    type: String,
     required: true,
     index: true
   },
@@ -60,8 +53,7 @@ const ParseItemListingSchema = new Schema<IParseItemlisting>({
     required: true
   },
   amount: {
-    type: Number,
-    required: true
+    type: Number
   },
   enchantmentLvl: {
     type: Number

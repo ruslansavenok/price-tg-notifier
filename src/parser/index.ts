@@ -6,110 +6,12 @@ import '../db/models/ParseItem';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
-import { LISTING_TYPE } from '../db/models/ParseItemListing';
-import bot from '../bot';
 import { serverNameFromId } from '../bot/utils';
 import logger from '../logger';
-import parseItemPage from './parseItemPage';
-import { processListing, newListingMessage } from './listings';
+import { processTask, markTaskParsed } from './task';
 
 async function sleep(ms: number) {
   return await new Promise(r => setTimeout(r, ms));
-}
-
-async function processTask(
-  task: Document<any, any, IParseItemSubscription> & IParseItemSubscription
-) {
-  const { sellListings, buyListings } = await parseItemPage(
-    task.parseItem.parseId,
-    task.serverId
-  );
-  Sentry.addBreadcrumb({
-    message: `Page parsed ${task.parseItem.parseId}`,
-    level: Sentry.Severity.Info
-  });
-
-  const allSubscriptionsForGivenServer = await ParseItemSubscription.find({
-    parseItem: task.parseItem,
-    serverId: task.serverId
-  }).populate(['parseItem', 'tgUser']);
-
-  for (const rawListing of sellListings) {
-    const { isNew, listing } = await processListing(
-      task,
-      LISTING_TYPE.SELL,
-      rawListing
-    );
-    Sentry.addBreadcrumb({
-      message: `Processed sell listing task=${task.parseItem.parseId}, listing=${listing.listingId}, isNew=${isNew}`,
-      level: Sentry.Severity.Info
-    });
-    if (!isNew) continue;
-
-    for (const subscription of allSubscriptionsForGivenServer) {
-      const validEnchantmentLevel =
-        typeof listing.enchantmentLvl === 'number' &&
-        typeof subscription.minEnchantmentLevel === 'number'
-          ? listing.enchantmentLvl >= subscription.minEnchantmentLevel
-          : true;
-
-      if (
-        typeof subscription.priceLimit === 'number' &&
-        listing.price <= subscription.priceLimit &&
-        listing.registeredAt >= subscription.createdAt &&
-        validEnchantmentLevel
-      ) {
-        bot.api.sendMessage(
-          subscription.tgUser.tgUserId,
-          newListingMessage(subscription, listing),
-          {
-            parse_mode: 'Markdown'
-          }
-        );
-      }
-      subscription.lastParsedAt = new Date();
-      await subscription.save();
-    }
-  }
-
-  for (const rawListing of buyListings) {
-    Sentry.addBreadcrumb({
-      message: `Processed buy listing task=${task.parseItem.parseId}, listing=${rawListing.id}`,
-      level: Sentry.Severity.Info
-    });
-    const { isNew, listing } = await processListing(
-      task,
-      LISTING_TYPE.BUY,
-      rawListing
-    );
-    if (!isNew) continue;
-
-    for (const subscription of allSubscriptionsForGivenServer) {
-      if (
-        typeof subscription.buyPriceLimit === 'number' &&
-        listing.price >= subscription.buyPriceLimit &&
-        listing.registeredAt >= subscription.createdAt
-      ) {
-        bot.api.sendMessage(
-          subscription.tgUser.tgUserId,
-          newListingMessage(subscription, listing),
-          {
-            parse_mode: 'Markdown'
-          }
-        );
-        subscription.lastParsedAt = new Date();
-        await subscription.save();
-      }
-    }
-  }
-}
-
-async function markTaskParsed(
-  task: Document<any, any, IParseItemSubscription> & IParseItemSubscription
-) {
-  task.currentWorkerId = null;
-  task.lastParsedAt = new Date();
-  await task.save();
 }
 
 export default async function startParser(workerId: number): Promise<any> {
@@ -126,9 +28,6 @@ export default async function startParser(workerId: number): Promise<any> {
     return startParser(workerId);
   }
 
-  let tickStartedAt: any;
-  let tickInterval: any;
-
   while (true) {
     await sleep(2000);
     const startedAtTs = new Date().getTime();
@@ -136,31 +35,7 @@ export default async function startParser(workerId: number): Promise<any> {
       | (Document<any, any, IParseItemSubscription> & IParseItemSubscription)
       | undefined;
 
-    // TODO:
-    // Trying to get some clues on when and why while loop get stuck
-    tickStartedAt = new Date().getTime();
-    clearInterval(tickInterval);
-    tickInterval = setInterval(() => {
-      const ts = new Date().getTime();
-
-      if (ts - tickStartedAt > 1000 * 60 * 2) {
-        Sentry.captureMessage(`Parser tick is taking too long`, {
-          extra: {
-            workerId,
-            task: task ? JSON.stringify(task) : null,
-            startedAtTs,
-            now: new Date().getTime()
-          }
-        });
-      }
-    }, 2 * 60 * 1000);
-
     try {
-      Sentry.addBreadcrumb({
-        message: 'Try to find a task',
-        level: Sentry.Severity.Info
-      });
-
       task = await ParseItemSubscription.findOneAndUpdate(
         {
           currentWorkerId: null
@@ -183,11 +58,6 @@ export default async function startParser(workerId: number): Promise<any> {
       ]);
 
       if (task && task.tgUser.accessCode.expireAt > new Date()) {
-        Sentry.addBreadcrumb({
-          message: `Task found ${task.parseItem.parseId}, processing...`,
-          level: Sentry.Severity.Info
-        });
-
         await processTask(task);
         await markTaskParsed(task);
         logger.info(
@@ -196,10 +66,6 @@ export default async function startParser(workerId: number): Promise<any> {
           )}, worker=${workerId}`
         );
       } else {
-        Sentry.addBreadcrumb({
-          message: `No task found`,
-          level: Sentry.Severity.Info
-        });
         continue;
       }
     } catch (e) {
@@ -223,7 +89,6 @@ export default async function startParser(workerId: number): Promise<any> {
 
       return startParser(workerId);
     } finally {
-      clearInterval(tickInterval);
       logger.metric.gauge(
         `parser.worker.${workerId}.taskDuration`,
         new Date().getTime() - startedAtTs

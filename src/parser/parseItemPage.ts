@@ -6,7 +6,7 @@ import { DATASOURCE_HOSTNAME } from '../../config';
 import { getSessionCookie, setSessionCookie } from '../db/datasourceConfig';
 
 export interface IItemListing {
-  id: number;
+  id: string;
   playerName: string;
   playerLocation: string;
   price: number;
@@ -126,7 +126,7 @@ async function parseItemPage(
           .map(el => $(el));
 
         return {
-          id: parseInt(id, 10),
+          id,
           playerName: $cols[colIndex.playerName].text(),
           playerLocation: $cols[colIndex.playerLocation].text(),
           price: parseInt(parseOrderValue($cols[colIndex.price]), 10),

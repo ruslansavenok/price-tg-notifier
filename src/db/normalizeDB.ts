@@ -12,8 +12,6 @@ const createLogger = (fnName: string) => (str: string) =>
 // TODO: replace with mongo-migrate
 async function normalizeDB() {
   await dec20_2021_fix_access_key_assignments();
-  await jan2_2022_fix_parse_item_subsription_created_at();
-  await jan2_2022_change_listing_fields();
 }
 
 // Legacy logins which didn't update accessKey assignments
@@ -36,39 +34,6 @@ async function dec20_2021_fix_access_key_assignments() {
       log(`Modified key=${key._id}`);
     }
   }
-}
-
-// Legacy subscriptions without createdAt timestamp
-async function jan2_2022_fix_parse_item_subsription_created_at() {
-  const log = createLogger('jan2_2022_fix_parse_item_subsription_created_at');
-
-  const res = await ParseItemSubscription.updateMany(
-    {
-      createdAt: {
-        $exists: false
-      }
-    },
-    {
-      createdAt: new Date(new Date().getTime() - 1000 * 60 * 60)
-    }
-  );
-  log(`Found ${res.matchedCount}, updated ${res.modifiedCount}`);
-}
-
-async function jan2_2022_change_listing_fields() {
-  const log = createLogger('jan2_2022_change_listing_fields');
-
-  const res = await ParseItemListing.updateMany(
-    {
-      type: {
-        $exists: false
-      }
-    },
-    { $rename: { sellerName: 'playerName' }, type: LISTING_TYPE.SELL },
-    { multi: true }
-  );
-
-  log(`Found ${res.matchedCount}, updated ${res.modifiedCount}`);
 }
 
 export default normalizeDB;
