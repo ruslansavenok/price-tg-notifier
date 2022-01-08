@@ -35,7 +35,13 @@ export async function setSessionCookie(value: string) {
   if (value !== runtimeCookie) {
     try {
       logger.info(`Upadating runtimeCookie=${value}`);
-      await DataSourceConfig.findOneAndUpdate({}, { sessionCookie: value });
+      await DataSourceConfig.findOneAndUpdate(
+        {},
+        { sessionCookie: value },
+        {
+          upsert: true
+        }
+      );
     } catch (e) {
       logger.error(e);
       Sentry.captureException(e);
