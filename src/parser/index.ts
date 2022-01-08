@@ -10,9 +10,13 @@ import { serverNameFromId } from '../bot/utils';
 import logger from '../logger';
 import { processTask, markTaskParsed } from './task';
 
-async function sleep(ms: number) {
-  return await new Promise(r => setTimeout(r, ms));
+interface IWorkerState {
+  id: number;
+  lastTickAt: number;
+  isWorking: boolean;
 }
+
+const WORKER_STATE = <Record<number, IWorkerState>>{};
 
 export default async function startParser(workerId: number): Promise<any> {
   try {
@@ -28,71 +32,116 @@ export default async function startParser(workerId: number): Promise<any> {
     return startParser(workerId);
   }
 
-  while (true) {
-    await sleep(2000);
-    const startedAtTs = new Date().getTime();
-    let task:
-      | (Document<any, any, IParseItemSubscription> & IParseItemSubscription)
-      | undefined;
+  WORKER_STATE[workerId] = {
+    id: workerId,
+    lastTickAt: Date.now(),
+    isWorking: false
+  };
 
-    try {
-      task = await ParseItemSubscription.findOneAndUpdate(
-        {
-          currentWorkerId: null
-        },
-        {
-          currentWorkerId: workerId
-        },
-        {
-          returnDocument: 'after',
-          sort: { lastParsedAt: 1 }
-        }
-      ).populate([
-        'parseItem',
-        {
-          path: 'tgUser',
-          populate: {
-            path: 'accessCode'
-          }
-        }
-      ]);
+  let tickInterval: any;
+  const tickOptions = {
+    worker: WORKER_STATE[workerId],
+    restartWorker: () => {
+      clearInterval(tickInterval);
+      startParser(workerId);
+    }
+  };
 
-      if (task && task.tgUser.accessCode.expireAt > new Date()) {
-        await processTask(task);
-        await markTaskParsed(task);
-        logger.info(
-          `Processed ${task.parseItem.parseId} for server=${serverNameFromId(
-            task.serverId
-          )}, worker=${workerId}`
-        );
-      } else {
-        continue;
+  tickInterval = setInterval(() => parseTick(tickOptions), 50);
+}
+
+async function parseTick({
+  worker,
+  restartWorker
+}: {
+  worker: IWorkerState;
+  restartWorker: Function;
+}) {
+  // NOTE:
+  // Restart worker if working too long
+  if (Date.now() - worker.lastTickAt > 1000 * 60 * 5) {
+    Sentry.captureException('Parser tick is taking too long', {
+      extra: {
+        id: worker.id,
+        ts: Date.now(),
+        lastTickAt: worker.lastTickAt
       }
-    } catch (e) {
-      Sentry.captureException(e);
-      console.log(e);
+    });
+    return restartWorker();
+  }
 
-      if (task) {
-        try {
-          await markTaskParsed(task);
-        } catch (e) {
-          Sentry.captureException(e);
-          console.log(e);
-        }
+  // NOTE:
+  // Skip if worker is busy
+  if (worker.isWorking) return;
 
-        logger.error(
-          `Task crashed ${task.parseItem.parseId} for server=${serverNameFromId(
-            task.serverId
-          )}, worker=${workerId}`
-        );
+  worker.isWorking = true;
+
+  await sleep(1500);
+  worker.lastTickAt = Date.now();
+  let task:
+    | (Document<any, any, IParseItemSubscription> & IParseItemSubscription)
+    | undefined;
+
+  try {
+    task = await ParseItemSubscription.findOneAndUpdate(
+      {
+        currentWorkerId: null
+      },
+      {
+        currentWorkerId: worker.id
+      },
+      {
+        returnDocument: 'after',
+        sort: { lastParsedAt: 1 }
       }
+    ).populate([
+      'parseItem',
+      {
+        path: 'tgUser',
+        populate: {
+          path: 'accessCode'
+        }
+      }
+    ]);
 
-      return startParser(workerId);
-    } finally {
-      logger.metric.gauge(
-        `parser.worker.${workerId}.taskDuration`,
-        new Date().getTime() - startedAtTs
+    if (task && task.tgUser.accessCode.expireAt > new Date()) {
+      await processTask(task);
+      await markTaskParsed(task);
+      logger.info(
+        `Processed ${task.parseItem.parseId} for server=${serverNameFromId(
+          task.serverId
+        )}, worker=${worker.id}`
       );
     }
+  } catch (e) {
+    Sentry.captureException(e);
+    console.log(e);
+
+    if (task) {
+      try {
+        await markTaskParsed(task);
+      } catch (e) {
+        Sentry.captureException(e);
+        console.log(e);
+      }
+
+      logger.error(
+        `Task crashed ${task.parseItem.parseId} for server=${serverNameFromId(
+          task.serverId
+        )}, worker=${worker.id}`
+      );
+    }
+
+    return restartWorker();
+  } finally {
+    logger.metric.gauge(
+      `parser.worker.${worker.id}.taskDuration`,
+      Date.now() - worker.lastTickAt
+    );
+    worker.isWorking = false;
   }
+}
+
+async function sleep(ms: number) {
+  return await new Promise(r => setTimeout(r, ms));
 }
