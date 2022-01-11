@@ -73,10 +73,12 @@ async function parseTick({
   // NOTE:
   // Skip if worker is busy
   if (worker.isWorking) return;
-
   worker.isWorking = true;
 
-  await sleep(1500);
+  // NOTE:
+  // Datasource refusing too many req/sec so we sleep for 1500 before every task
+  await sleep(2000);
+
   worker.lastTickAt = Date.now();
   let task:
     | (Document<any, any, IParseItemSubscription> & IParseItemSubscription)
