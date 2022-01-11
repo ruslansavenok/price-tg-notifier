@@ -77,7 +77,7 @@ async function parseTick({
 
   // NOTE:
   // Datasource refusing too many req/sec so we sleep for 1500 before every task
-  await sleep(2000);
+  await sleep(1500);
 
   worker.lastTickAt = Date.now();
   let task:
