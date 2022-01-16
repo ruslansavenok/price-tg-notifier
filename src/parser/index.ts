@@ -41,6 +41,7 @@ export default async function startParser(workerId: number): Promise<any> {
   let tickInterval: any;
   const tickOptions = {
     worker: WORKER_STATE[workerId],
+    timerId: `${workerId}-${Date.now().toString().slice(-4)}`,
     restartWorker: () => {
       clearInterval(tickInterval);
       startParser(workerId);
@@ -52,14 +53,17 @@ export default async function startParser(workerId: number): Promise<any> {
 
 async function parseTick({
   worker,
+  timerId,
   restartWorker
 }: {
   worker: IWorkerState;
+  timerId: String;
   restartWorker: Function;
 }) {
   // NOTE:
   // Restart worker if working too long
-  if (Date.now() - worker.lastTickAt > 1000 * 60 * 5) {
+  if (Date.now() - worker.lastTickAt > 1000 * 60) {
+    logger.error('Parser tick is taking too long, restarting...');
     Sentry.captureException('Parser tick is taking too long', {
       extra: {
         id: worker.id,
@@ -112,7 +116,7 @@ async function parseTick({
       logger.info(
         `Processed ${task.parseItem.parseId} for server=${serverNameFromId(
           task.serverId
-        )}, worker=${worker.id}`
+        )}, worker=${worker.id}, timerId=${timerId}`
       );
     }
   } catch (e) {
@@ -130,7 +134,7 @@ async function parseTick({
       logger.error(
         `Task crashed ${task.parseItem.parseId} for server=${serverNameFromId(
           task.serverId
-        )}, worker=${worker.id}`
+        )}, worker=${worker.id}, timerId=${timerId}`
       );
     }
 
