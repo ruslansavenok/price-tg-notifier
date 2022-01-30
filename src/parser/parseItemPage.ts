@@ -45,6 +45,9 @@ async function fetchPageHtml(
     }
   });
 
+  // TODO:
+  // This method is unreliable, we need to have a separate process performing
+  // login with real credentials every N hours to get a cookie
   (page.headers['set-cookie'] || []).forEach(str => {
     const { PHPSESSID } = cookie.parse(str);
     if (PHPSESSID) {
