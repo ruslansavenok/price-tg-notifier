@@ -16,7 +16,7 @@ const ITEMS_PER_GROUP = 30;
 
 function getSubscriptionCommand(item: IParseItemSubscription) {
   const command = [
-    '/sub',
+    `/sub ${item.parseItem.parseId}`,
     `-s ${serverNameFromId(item.serverId).toLowerCase()}`
   ];
   if (item.minEnchantmentLevel) command.push(`-e ${item.minEnchantmentLevel}`);
