@@ -37,15 +37,16 @@ function getSubscriptionInfo(item: IParseItemSubscription) {
   });
 
   const formattedSellBuyPrice = [
-    '*SELL*: ' +
-      (item.priceLimit
+    `SELL: *${
+      item.priceLimit
         ? item.priceLimit === MAX_ITEM_PRICE
           ? 'MAX'
           : item.priceLimit.toLocaleString()
-        : '-')
+        : '-'
+    }*`
   ];
   if (item.buyPriceLimit)
-    formattedSellBuyPrice.push('*BUY*: ' + item.buyPriceLimit.toLocaleString());
+    formattedSellBuyPrice.push(`BUY: *${item.buyPriceLimit.toLocaleString()}*`);
 
   return `[${title}](${url}) - ${formattedSellBuyPrice.join(' / ')}`;
 }
