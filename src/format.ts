@@ -1,4 +1,5 @@
 import round from 'lodash/round';
+import { DATASOURCE_HOSTNAME } from '../config';
 
 const TRILLION = Math.pow(10, 12);
 const BILLION = Math.pow(10, 9);
@@ -24,3 +25,12 @@ export function parsePrice(value: string): number {
     return parseInt(value, 10);
   }
 }
+
+export const parseItemUrl = ({
+  itemId,
+  serverId
+}: {
+  itemId: number;
+  serverId: number;
+}) =>
+  `http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=${itemId}&setworld=${serverId}`;

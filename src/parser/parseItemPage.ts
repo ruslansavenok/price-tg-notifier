@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Iconv } from 'iconv';
 import cookie from 'cookie';
 import cherio, { Cheerio, Element } from 'cheerio';
-import { DATASOURCE_HOSTNAME } from '../../config';
+import { parseItemUrl } from '../format';
 import { getSessionCookie, setSessionCookie } from '../db/datasourceConfig';
 
 export interface IItemListing {
@@ -20,15 +20,6 @@ export interface IParseItemInfo {
   sellListings: IItemListing[];
   buyListings: IItemListing[];
 }
-
-export const itemUrl = ({
-  itemId,
-  serverId
-}: {
-  itemId: number;
-  serverId: number;
-}) =>
-  `http://${DATASOURCE_HOSTNAME}/?c=market&a=item&id=${itemId}&setworld=${serverId}`;
 
 async function fetchPageHtml(
   url: string,
@@ -77,7 +68,7 @@ async function parseItemPage(
   itemId: number,
   serverId: number
 ): Promise<IParseItemInfo> {
-  const url = itemUrl({ itemId, serverId });
+  const url = parseItemUrl({ itemId, serverId });
   const urlHtml = await fetchPageHtml(url, serverId);
   const $ = cherio.load(urlHtml);
 

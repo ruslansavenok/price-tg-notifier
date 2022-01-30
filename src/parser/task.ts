@@ -9,7 +9,8 @@ import ParseItemListing, {
 } from '../db/models/ParseItemListing';
 import { serverNameFromId } from '../bot/utils';
 import bot from '../bot';
-import parseItemPage, { itemUrl } from './parseItemPage';
+import { parseItemUrl } from '../format';
+import parseItemPage from './parseItemPage';
 
 export const newListingMessage = (
   task: Document<any, any, IParseItemSubscription> & IParseItemSubscription,
@@ -23,7 +24,7 @@ export const newListingMessage = (
 *ENH:* ${listing.enchantmentLvl ? `+${listing.enchantmentLvl}` : '-'}
 *ID:* ${listing.listingId}
 *SERVER:* ${serverNameFromId(task.serverId)}
-[OPEN L2ON](${itemUrl({
+[OPEN L2ON](${parseItemUrl({
   itemId: task.parseItem.parseId,
   serverId: task.serverId
 })})

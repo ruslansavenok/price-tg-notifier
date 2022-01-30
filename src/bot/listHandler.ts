@@ -2,6 +2,7 @@ import { Composer } from 'grammy';
 import { table } from 'table';
 import chunk from 'lodash/chunk';
 import { MAX_ITEM_PRICE } from '../../config';
+import { formatPrice, parseItemUrl } from '../format';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
@@ -11,37 +12,53 @@ import {
   serverNameFromId
 } from './utils';
 
-function renderResult(items: IParseItemSubscription[], withHeader = true) {
-  const result: (string | number)[][] = [];
+const ITEMS_PER_GROUP = 30;
 
-  if (withHeader) {
-    result.push(['ID', 'Title', 'Sell/Buy Price', 'Server']);
-  }
+function getSubscriptionCommand(item: IParseItemSubscription) {
+  const command = [
+    '/sub',
+    `-s ${serverNameFromId(item.serverId).toLowerCase()}`
+  ];
+  if (item.minEnchantmentLevel) command.push(`-e ${item.minEnchantmentLevel}`);
+  if (item.priceLimit && item.priceLimit !== MAX_ITEM_PRICE)
+    command.push(`-p ${formatPrice(item.priceLimit)}`);
+  if (item.buyPriceLimit)
+    command.push(`-bp ${formatPrice(item.buyPriceLimit)}`);
+  return command.join(' ');
+}
 
-  items.forEach(item => {
-    const enchStr =
-      item.minEnchantmentLevel > 0 ? `(+${item.minEnchantmentLevel}) ` : '';
+function getSubscriptionInfo(item: IParseItemSubscription) {
+  const enchStr =
+    item.minEnchantmentLevel > 0 ? `(+${item.minEnchantmentLevel}) ` : '';
+  const title = enchStr + item.parseItem.title;
+  const url = parseItemUrl({
+    itemId: item.parseItem.parseId,
+    serverId: item.serverId
+  });
 
-    const sellBuyPrice = [
-      item.priceLimit
+  const formattedSellBuyPrice = [
+    '*SELL*: ' +
+      (item.priceLimit
         ? item.priceLimit === MAX_ITEM_PRICE
           ? 'MAX'
           : item.priceLimit.toLocaleString()
-        : '-'
-    ];
-    if (item.buyPriceLimit)
-      sellBuyPrice.push(item.buyPriceLimit.toLocaleString());
+        : '-')
+  ];
+  if (item.buyPriceLimit)
+    formattedSellBuyPrice.push('*BUY*: ' + item.buyPriceLimit.toLocaleString());
 
-    const values = [
-      item.parseItem.parseId,
-      enchStr + item.parseItem.title,
-      sellBuyPrice.join(' / '),
-      serverNameFromId(item.serverId)
-    ];
-    result.push(values);
-  });
+  return `[${title}](${url}) - ${formattedSellBuyPrice.join(' / ')}`;
+}
 
-  return `\`${table(result)}\``;
+function renderResult(items: IParseItemSubscription[], groupIndex: number) {
+  return items
+    .map((item, itemIndex) => {
+      const itemNumber = ITEMS_PER_GROUP * groupIndex + itemIndex + 1;
+      const info = getSubscriptionInfo(item);
+      const command = getSubscriptionCommand(item);
+      return `${itemNumber}. ${info}\n\`${command}\``;
+    })
+    .join('\n\n');
 }
 
 function handleListCommandFactory(command: string) {
@@ -56,8 +73,8 @@ function handleListCommandFactory(command: string) {
       tgUser: user
     }).populate('parseItem');
 
-    chunk(itemSubscriptions, 15).forEach((group, i) => {
-      ctx.reply(renderResult(group, i === 0 ? true : false), {
+    chunk(itemSubscriptions, ITEMS_PER_GROUP).forEach((group, i) => {
+      ctx.reply(renderResult(group, i), {
         parse_mode: 'Markdown'
       });
     });
