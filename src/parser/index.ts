@@ -64,7 +64,6 @@ async function parseTick({
   // Restart worker if working too long
   if (Date.now() - worker.lastTickAt > 1000 * 60) {
     logger.error('Parser tick is taking too long, restarting...');
-    logger.metric.increment(`parser.worker.longTick`, 1);
     Sentry.captureException('Parser tick is taking too long', {
       extra: {
         id: worker.id,
@@ -137,6 +136,7 @@ async function parseTick({
           task.serverId
         )}, worker=${timerId}`
       );
+      logger.metric.increment(`parser.worker.fail`, 1);
     }
 
     return restartWorker();
