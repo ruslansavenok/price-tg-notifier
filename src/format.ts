@@ -57,7 +57,7 @@ export function getSubscriptionCommand(item: IParseItemSubscription) {
   return command.join(' ');
 }
 
-export function getUnsubCommand(item: IParseItemSubscription) {
+export function getUnsubscribeCommand(item: IParseItemSubscription) {
   return `/unsub ${item.parseItem.parseId} -s ${serverNameFromId(
     item.serverId
   ).toLowerCase()}`;
