@@ -56,3 +56,9 @@ export function getSubscriptionCommand(item: IParseItemSubscription) {
     command.push(`-bp ${formatPrice(item.buyPriceLimit)}`);
   return command.join(' ');
 }
+
+export function getUnsubCommand(item: IParseItemSubscription) {
+  return `/unsub ${item.parseItem.parseId} -s ${serverNameFromId(
+    item.serverId
+  ).toLowerCase()}`;
+}

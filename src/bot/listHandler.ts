@@ -6,7 +6,7 @@ import { formatPrice, parseItemUrl } from '../format';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
-import { serverNameFromId, getSubscriptionCommand } from '../format';
+import { getSubscriptionCommand, getUnsubscribeCommand } from '../format';
 import { parseMessageData, isValidSubscription } from './utils';
 
 const ITEMS_PER_GROUP = 30;
@@ -40,8 +40,9 @@ function renderResult(items: IParseItemSubscription[], groupIndex: number) {
     .map((item, itemIndex) => {
       const itemNumber = ITEMS_PER_GROUP * groupIndex + itemIndex + 1;
       const info = getSubscriptionInfo(item);
-      const command = getSubscriptionCommand(item);
-      return `${itemNumber}. ${info}\n\`${command}\``;
+      const subCommand = getSubscriptionCommand(item);
+      const unsubCommand = getUnsubscribeCommand(item);
+      return `${itemNumber}. ${info}\n\`${subCommand}\` - \`${unsubCommand}\``;
     })
     .join('\n\n');
 }
