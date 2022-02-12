@@ -1,12 +1,8 @@
 import { Composer } from 'grammy';
 import ParseItem from '../db/models/ParseItem';
 import ParseItemSubscription from '../db/models/ParseItemSubscription';
-import {
-  parseMessageData,
-  isValidSubscription,
-  parseItemId,
-  serverNameFromId
-} from './utils';
+import { serverNameFromId } from '../format';
+import { parseMessageData, isValidSubscription, parseItemId } from './utils';
 
 const invalidFormatMsg = (command: string) => `
 Invalid format:

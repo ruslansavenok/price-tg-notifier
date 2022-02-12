@@ -7,12 +7,15 @@ import ParseItemListing, {
   IParseItemlisting,
   LISTING_TYPE
 } from '../db/models/ParseItemListing';
-import { serverNameFromId } from '../bot/utils';
 import bot from '../bot';
-import { parseItemUrl } from '../format';
+import {
+  parseItemUrl,
+  serverNameFromId,
+  getSubscriptionCommand
+} from '../format';
 import parseItemPage from './parseItemPage';
 
-export const newListingMessage = (
+const newListingMessage = (
   task: Document<any, any, IParseItemSubscription> & IParseItemSubscription,
   listing: Document<any, any, IParseItemlisting> & IParseItemlisting
 ) => `🚨🚨 ${listing.type === LISTING_TYPE.SELL ? 'SELL' : 'BUY'}
@@ -29,6 +32,37 @@ export const newListingMessage = (
   serverId: task.serverId
 })})
 `;
+
+const newListingMessageV2 = (
+  task: Document<any, any, IParseItemSubscription> & IParseItemSubscription,
+  listing: Document<any, any, IParseItemlisting> & IParseItemlisting
+) => {
+  const url = parseItemUrl({
+    itemId: task.parseItem.parseId,
+    serverId: task.serverId
+  });
+  const elements: string[][] = [];
+
+  elements.push([]);
+  if (listing.enchantmentLvl) elements[0].push(`+${listing.enchantmentLvl}`);
+  elements[0].push(`[${task.parseItem.title}](${url})`);
+  if (listing.amount) elements[0].push(`(${listing.amount})`);
+  elements[0].push('-');
+  elements[0].push(`${listing.type === LISTING_TYPE.SELL ? 'SELL' : 'BUY'}:`);
+  elements[0].push(`${listing.price.toLocaleString()}`);
+
+  elements.push([]);
+  elements[1].push(listing.playerName);
+  elements[1].push('-');
+  elements[1].push(serverNameFromId(task.serverId));
+  elements[1].push('-');
+  elements[1].push(formatDate(listing.registeredAt, 'MM/dd/yyyy - HH:mm'));
+
+  elements.push([]);
+  elements[2].push(`\`${getSubscriptionCommand(task)}\``);
+
+  return elements.map(arr => arr.join(' ')).join('\n');
+};
 
 export async function markTaskParsed(
   task: Document<any, any, IParseItemSubscription> & IParseItemSubscription
@@ -104,7 +138,7 @@ export async function processTask(
       if (isValidEnchantmentLevel && (isValidSell || isValidBuy)) {
         bot.api.sendMessage(
           subscription.tgUser.tgUserId,
-          newListingMessage(subscription, newRecord),
+          newListingMessageV2(subscription, newRecord),
           {
             parse_mode: 'Markdown'
           }

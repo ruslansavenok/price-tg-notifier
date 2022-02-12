@@ -6,26 +6,10 @@ import { formatPrice, parseItemUrl } from '../format';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
-import {
-  parseMessageData,
-  isValidSubscription,
-  serverNameFromId
-} from './utils';
+import { serverNameFromId, getSubscriptionCommand } from '../format';
+import { parseMessageData, isValidSubscription } from './utils';
 
 const ITEMS_PER_GROUP = 30;
-
-function getSubscriptionCommand(item: IParseItemSubscription) {
-  const command = [
-    `/sub ${item.parseItem.parseId}`,
-    `-s ${serverNameFromId(item.serverId).toLowerCase()}`
-  ];
-  if (item.minEnchantmentLevel) command.push(`-e ${item.minEnchantmentLevel}`);
-  if (item.priceLimit && item.priceLimit !== MAX_ITEM_PRICE)
-    command.push(`-p ${formatPrice(item.priceLimit)}`);
-  if (item.buyPriceLimit)
-    command.push(`-bp ${formatPrice(item.buyPriceLimit)}`);
-  return command.join(' ');
-}
 
 function getSubscriptionInfo(item: IParseItemSubscription) {
   const enchStr =

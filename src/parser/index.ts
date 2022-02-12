@@ -6,7 +6,7 @@ import '../db/models/ParseItem';
 import ParseItemSubscription, {
   IParseItemSubscription
 } from '../db/models/ParseItemSubscription';
-import { serverNameFromId } from '../bot/utils';
+import { serverNameFromId } from '../format';
 import logger from '../logger';
 import { processTask, markTaskParsed } from './task';
 
