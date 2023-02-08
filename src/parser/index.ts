@@ -124,19 +124,20 @@ async function parseTick({
     console.log(e);
 
     if (task) {
-      try {
-        await markTaskParsed(task);
-      } catch (e) {
-        Sentry.captureException(e);
-        console.log(e);
-      }
-
       logger.error(
         `Task crashed ${task.parseItem.parseId} for server=${serverNameFromId(
           task.serverId
         )}, worker=${timerId}`
       );
       logger.metric.increment(`parser.worker.fail`, 1);
+
+      try {
+        await markTaskParsed(task);
+      } catch (e) {
+        Sentry.captureException(e);
+        console.log(e);
+        return restartWorker();
+      }
     }
 
     return restartWorker();
