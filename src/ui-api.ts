@@ -13,7 +13,7 @@ fastify.get('/', function (request, reply) {
   reply.send({ hello: 'world' });
 });
 
-fastify.listen({ port: UI_API_PORT }, function (err) {
+fastify.listen({ port: UI_API_PORT, host: '0.0.0.0' }, function (err) {
   if (err) {
     fastify.log.error(err);
     process.exit(1);
