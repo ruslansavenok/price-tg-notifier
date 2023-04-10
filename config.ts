@@ -14,7 +14,7 @@ function getEnvVariable(key: string, required = true) {
   return value;
 }
 
-const envApiPort = getEnvVariable('UI_API_PORT', false);
+const envApiPort = getEnvVariable('PORT', false);
 export const UI_API_PORT = envApiPort ? parseInt(envApiPort) : 3000;
 
 export const MONGO_DB_URL = getEnvVariable('MONGO_DB_URL');
