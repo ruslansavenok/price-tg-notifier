@@ -4,6 +4,7 @@ export interface IParseItem {
   _id: Schema.Types.ObjectId;
   parseId: number;
   title: string;
+  imagePath: string;
 }
 
 const ParseItemSchema = new Schema<IParseItem>({
@@ -15,6 +16,10 @@ const ParseItemSchema = new Schema<IParseItem>({
   title: {
     type: String,
     index: true,
+    required: true
+  },
+  imagePath: {
+    type: String,
     required: true
   }
 });

@@ -17,6 +17,7 @@ export interface IItemListing {
 
 export interface IParseItemInfo {
   title: string;
+  imagePath: string;
   sellListings: IItemListing[];
   buyListings: IItemListing[];
 }
@@ -88,6 +89,9 @@ async function parseItemPage(
 
   const title = $('#content h1').text();
   const titleSup = $('#content h1 sup').text();
+  const imagePath = (
+    $(`[iteminfo="${itemId}"]`).css('background') || ''
+  ).replace(/url\(\'(.*)?\'\).*/gi, '$1');
 
   function getDataFromTable(selector: string) {
     const columnNames = $(`${selector} thead tr th`)
@@ -144,6 +148,7 @@ async function parseItemPage(
 
   return {
     title: title.replace(titleSup, '').trim(),
+    imagePath,
     sellListings,
     buyListings
   };

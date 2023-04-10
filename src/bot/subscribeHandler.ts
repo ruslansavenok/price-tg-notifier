@@ -81,8 +81,15 @@ function handleSubsribeCommandFactory(command: string) {
 
       if (!parseItem) {
         try {
-          const { title } = await parseItemPage(itemId, SERVERS.AIRIN);
-          parseItem = await ParseItem.create({ parseId: itemId, title });
+          const { title, imagePath } = await parseItemPage(
+            itemId,
+            SERVERS.AIRIN
+          );
+          parseItem = await ParseItem.create({
+            parseId: itemId,
+            title,
+            imagePath
+          });
         } catch (e) {
           console.log(e);
           Sentry.captureException(e);

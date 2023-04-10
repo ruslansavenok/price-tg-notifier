@@ -1,8 +1,10 @@
 import TgBotUser from '../db/models/TgBotUser';
 import TgBotAccessKey from '../db/models/TgBotAccessKey';
-import ParseItemSubscription from './models/ParseItemSubscription';
-import ParseItemListing, { LISTING_TYPE } from './models/ParseItemListing';
+import ParseItem from './models/ParseItem';
 import logger from '../logger';
+import parseItemPage from '../parser/parseItemPage';
+import { parseItemUrl } from '../format';
+import { SERVERS } from '../../config';
 
 const createLogger = (fnName: string) => (str: string) =>
   logger.info(`[${fnName}] ${str}`);
@@ -12,6 +14,7 @@ const createLogger = (fnName: string) => (str: string) =>
 // TODO: replace with mongo-migrate
 async function normalizeDB() {
   await dec20_2021_fix_access_key_assignments();
+  await apr10_2023_update_parse_item_images();
 }
 
 // Legacy logins which didn't update accessKey assignments
@@ -33,6 +36,22 @@ async function dec20_2021_fix_access_key_assignments() {
       await key.save();
       log(`Modified key=${key._id}`);
     }
+  }
+}
+
+async function apr10_2023_update_parse_item_images() {
+  const log = createLogger('apr10_2023_update_parse_item_images');
+
+  const items = await ParseItem.find({ imagePath: { $exists: false } });
+  log(`Found ${items.length} items...`);
+
+  for (const item of items) {
+    log(`Processing item=${item.parseId}`);
+    const { imagePath } = await parseItemPage(item.parseId, SERVERS.AIRIN);
+    log(`Image found path=${imagePath}`);
+    item.imagePath = imagePath;
+    await item.save();
+    log(`Processing done`);
   }
 }
 
