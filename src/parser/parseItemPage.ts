@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Iconv } from 'iconv';
 import cookie from 'cookie';
 import cherio, { Cheerio, Element } from 'cheerio';
+import { DATASOURCE_FETCH_TIMEOUT } from '../../config';
 import { parseItemUrl } from '../format';
 import { getSessionCookie, setSessionCookie } from '../db/datasourceConfig';
 
@@ -34,7 +35,7 @@ async function fetchPageHtml(
 
   const page = await axios(url, {
     method: 'GET',
-    timeout: 3000,
+    timeout: DATASOURCE_FETCH_TIMEOUT,
     responseType: 'arraybuffer',
     headers: {
       Cookie: cookies.join(' ')

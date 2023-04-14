@@ -15,10 +15,18 @@ function getEnvVariable(key: string, required = true) {
 }
 
 const envApiPort = getEnvVariable('UI_API_PORT', false);
+const envDatasourceFetchTiemout = getEnvVariable(
+  'DATASOURCE_FETCH_TIMEOUT',
+  false
+);
+
 export const UI_API_PORT = envApiPort ? parseInt(envApiPort) : 3000;
 
 export const MONGO_DB_URL = getEnvVariable('MONGO_DB_URL');
 export const DATASOURCE_HOSTNAME = getEnvVariable('DATASOURCE_HOSTNAME');
+export const DATASOURCE_FETCH_TIMEOUT = envDatasourceFetchTiemout
+  ? parseInt(envDatasourceFetchTiemout, 10)
+  : 3000;
 export const TELEGRAM_BOT_TOKEN = getEnvVariable('TELEGRAM_BOT_TOKEN');
 
 export const SENTRY_DSN = getEnvVariable('SENTRY_DSN', false);
