@@ -120,6 +120,8 @@ export async function processTask(
 
     for (const subscription of allSubscriptionsForGivenServer) {
       if (listing.registeredAt < subscription.createdAt) continue;
+      if (listing.registeredAt < new Date(Date.now() - 48 * 60 * 60 * 1000))
+        continue;
 
       const isValidEnchantmentLevel =
         typeof listing.enchantmentLvl === 'number' &&
