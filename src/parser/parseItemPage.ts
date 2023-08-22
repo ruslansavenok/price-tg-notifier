@@ -23,6 +23,8 @@ export interface IParseItemInfo {
   buyListings: IItemListing[];
 }
 
+const iconv = new Iconv('windows-1251', 'utf-8');
+
 async function fetchPageHtml(
   url: string,
   cookieWorld: number
@@ -41,9 +43,7 @@ async function fetchPageHtml(
       Cookie: cookies.join(' ')
     },
     transformResponse: function (data: Buffer) {
-      const iconv = new Iconv('windows-1251', 'utf-8');
-      data = iconv.convert(data);
-      return data.toString();
+      return iconv.convert(data).toString();
     }
   });
 
