@@ -1,4 +1,4 @@
-FROM node:16.17-alpine
+FROM node:20.5-alpine
 
 RUN apk add --no-cache --virtual .gyp python3 make g++
 
@@ -9,6 +9,6 @@ RUN yarn install
 
 COPY . .
 
-ENV NODE_OPTIONS="--max_old_space_size=300"
+ENV NODE_OPTIONS="--max-old-space-size=300"
 
 CMD ["yarn", "prod"]
