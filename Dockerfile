@@ -9,6 +9,6 @@ RUN yarn install
 
 COPY . .
 
-ENV NODE_OPTIONS="--max-old-space-size=300"
+ENV NODE_OPTIONS="--max-old-space-size=450"
 
 CMD ["yarn", "prod"]
