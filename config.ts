@@ -39,5 +39,7 @@ export const SERVERS: { [key: string]: number } = {
   ELCARDIA: 27,
   HATOS: 12,
   NAGA: 15,
-  SIRRA: 16
+  SIRRA: 16,
+  CADMUS: 501,
+  FARIS: 23
 };
